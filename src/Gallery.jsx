@@ -3,6 +3,14 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Suspense } from "react";
 
+function DebugBox() {
+  return (
+    <mesh position={[0, 1, 0]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="red" />
+    </mesh>
+  );
+}
 // Gallery Room Component
 function GalleryRoom() {
   return (
