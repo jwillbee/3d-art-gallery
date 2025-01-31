@@ -12,18 +12,8 @@ function ArtFrame({ position, rotation }) {
   );
 }
 
-// Sign component for room signs
-function Sign({ position, text }) {
-  return (
-    <mesh position={position}>
-      <textGeometry args={[text, { size: 0.2, height: 0.05 }]} />
-      <meshStandardMaterial color="black" />
-    </mesh>
-  );
-}
-
-// Room component with walls, floor, artframes, and a sign
-function Room({ position, rotation, name }) {
+// Room component with walls, floor, and artframes
+function Room({ position, rotation }) {
   return (
     <group position={position} rotation={rotation}>
       {/* Floor */}
@@ -54,9 +44,6 @@ function Room({ position, rotation, name }) {
       <ArtFrame position={[-4.9, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
       <ArtFrame position={[4.9, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
       <ArtFrame position={[0, 2, -4.9]} />
-
-      {/* Sign */}
-      {name && <Sign position={[0, 3.8, -4.5]} text={name} />}
     </group>
   );
 }
