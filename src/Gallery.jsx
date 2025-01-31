@@ -14,8 +14,13 @@ function DebugBox() {
 function GalleryRoom() {
   return (
     <group>
-      {/* Gallery walls, floor, ceiling (if applicable) */}
-      {/* Art frames go here */}
+      {/* 🔳 Temporary floor to confirm rendering */}
+      <mesh position={[0, -0.5, 0]} receiveShadow>
+        <boxGeometry args={[10, 0.1, 10]} />
+        <meshStandardMaterial color="gray" />
+      </mesh>
+      
+      {/* 🖼️ Future walls/art will go here */}
     </group>
   );
 }
