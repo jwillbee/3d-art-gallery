@@ -8,7 +8,6 @@
     "preview": "vite preview"
   },
   "scripts": {
-    "install": "npm install",
     "build": "vite build"
   },
   "dependencies": {
