@@ -95,7 +95,7 @@ export default function Gallery() {
   };
 
   return (
-    <Canvas camera={{ position: [0, 3, 25], fov: 50 }} ref={cameraRef}>
+    <Canvas camera={{ position: [0, 3, 10], fov: 50 }} ref={cameraRef}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 5, 2]} />
 
@@ -111,8 +111,8 @@ export default function Gallery() {
       ))}
 
       {/* Clickable spots */}
-      <ClickableSpot position={[0, 0.1, 20]} onClick={() => handleSpotClick([0, 1.5, 20])} />
-      <ClickableSpot position={[0, 0.1, -20]} onClick={() => handleSpotClick([0, 1.5, -20])} />
+      <ClickableSpot position={[0, 0.1, 2]} onClick={() => handleSpotClick([0, 1.5, 2])} />
+      <ClickableSpot position={[0, 0.1, -2]} onClick={() => handleSpotClick([0, 1.5, -2])} />
 
       {/* OrbitControls for camera movement */}
       <OrbitControls />
