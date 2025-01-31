@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "install": "npm install",
+    "build": "vite build"
+  }
   "name": "3d-art-gallery",
   "version": "1.0.0",
   "private": true,
