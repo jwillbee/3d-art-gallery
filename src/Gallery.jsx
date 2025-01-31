@@ -14,25 +14,25 @@ function ArtFrame({ position, rotation }) {
 function GalleryRoom() {
   return (
     <group>
-      {/* 🟦 Floor (Adjusted Walls to Remove Gap) */}
+      {/* 🟦 Floor (No Gap with Walls) */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[10, 0.1, 10]} />
         <meshStandardMaterial color="gray" />
       </mesh>
 
-      {/* 🟩 Left Wall (Lowered by 0.05) */}
-      <mesh position={[-5, 2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+      {/* 🟩 Left Wall (Fixed Rotation) */}
+      <mesh position={[-5, 2, 0]} receiveShadow>
         <boxGeometry args={[0.1, 4, 10]} />
         <meshStandardMaterial color="white" />
       </mesh>
 
-      {/* 🟩 Right Wall (Lowered by 0.05) */}
-      <mesh position={[5, 2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+      {/* 🟩 Right Wall (Fixed Rotation) */}
+      <mesh position={[5, 2, 0]} receiveShadow>
         <boxGeometry args={[0.1, 4, 10]} />
         <meshStandardMaterial color="white" />
       </mesh>
 
-      {/* 🟦 Back Wall (Lowered by 0.05) */}
+      {/* 🟦 Back Wall */}
       <mesh position={[0, 2, -5]} receiveShadow>
         <boxGeometry args={[10, 4, 0.1]} />
         <meshStandardMaterial color="white" />
