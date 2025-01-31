@@ -1,5 +1,5 @@
-import React from "react";
-import { Canvas } from "@react-three/fiber";
+import React, { useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
 // ArtFrame component for displaying the art
@@ -12,10 +12,20 @@ function ArtFrame({ position, rotation }) {
   );
 }
 
-// Room component with walls, floor, and artframes
-function Room({ position }) {
+// Sign component for room signs
+function Sign({ position, text }) {
   return (
-    <group position={position}>
+    <mesh position={position}>
+      <textGeometry args={[text, { size: 0.2, height: 0.05 }]} />
+      <meshStandardMaterial color="black" />
+    </mesh>
+  );
+}
+
+// Room component with walls, floor, artframes, and a sign
+function Room({ position, rotation, name }) {
+  return (
+    <group position={position} rotation={rotation}>
       {/* 🟦 Floor */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[10, 0.1, 10]} />
@@ -40,33 +50,69 @@ function Room({ position }) {
         <meshStandardMaterial color="white" />
       </mesh>
 
-      {/* 🎨 Art Frames */}
+      {/* Art Frames */}
       <ArtFrame position={[-4.9, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
       <ArtFrame position={[4.9, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
       <ArtFrame position={[0, 2, -4.9]} />
+
+      {/* Sign */}
+      {name && <Sign position={[0, 3.8, -4.5]} text={name} />}
     </group>
   );
 }
 
+function Doorway({ position }) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={[1, 3, 0.1]} />
+      <meshStandardMaterial color="brown" />
+    </mesh>
+  );
+}
+
+// Clickable Floor Spot component
+function ClickableSpot({ position, onClick }) {
+  return (
+    <mesh position={position} onClick={onClick} cursor="pointer">
+      <sphereGeometry args={[0.1, 16, 16]} />
+      <meshStandardMaterial color="red" />
+    </mesh>
+  );
+}
+
 export default function Gallery() {
-  // Room offset values to create the hallway effect
-  const roomDistance = -10; // Negative to move rooms along the Z-axis
+  const cameraRef = useRef();
+
+  // Rooms configuration
   const rooms = [
-    { position: [0, 0, 0] },   // Main Room
-    { position: [0, 0, roomDistance] },   // Room 2
-    { position: [0, 0, roomDistance * 2] }, // Room 3
-    { position: [0, 0, roomDistance * 3] }, // Room 4
+    { position: [0, 0, 0], name: "Main Room" },
+    { position: [-10, 0, 0], name: "Left Room", rotation: [0, Math.PI / 2, 0] },
+    { position: [10, 0, 0], name: "Right Room", rotation: [0, -Math.PI / 2, 0] }
   ];
 
+  const handleSpotClick = (position) => {
+    cameraRef.current.position.set(...position);
+  };
+
   return (
-    <Canvas camera={{ position: [0, 3, 25], fov: 50 }}>
+    <Canvas camera={{ position: [0, 3, 25], fov: 50 }} ref={cameraRef}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 5, 2]} />
 
       {/* Render all rooms */}
       {rooms.map((room, index) => (
-        <Room key={index} position={room.position} />
+        <group key={index}>
+          <Room position={room.position} rotation={room.rotation} name={room.name} />
+          {/* Doorways */}
+          {room.position[0] !== 0 && (
+            <Doorway position={room.position[0] < 0 ? [-5.5, 1.5, 0] : [5.5, 1.5, 0]} />
+          )}
+        </group>
       ))}
+
+      {/* Clickable spots */}
+      <ClickableSpot position={[0, 0.1, 20]} onClick={() => handleSpotClick([0, 1.5, 20])} />
+      <ClickableSpot position={[0, 0.1, -20]} onClick={() => handleSpotClick([0, 1.5, -20])} />
 
       {/* OrbitControls for camera movement */}
       <OrbitControls />
