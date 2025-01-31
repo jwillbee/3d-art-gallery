@@ -10,17 +10,44 @@ function DebugBox() {
     </mesh>
   );
 }
+function ArtFrame({ position }) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={[1.5, 1, 0.1]} />
+      <meshStandardMaterial color="black" />
+    </mesh>
+  );
+}
 
 function GalleryRoom() {
   return (
     <group>
-      {/* 🔳 Temporary floor to confirm rendering */}
+      {/* 🟦 Floor */}
       <mesh position={[0, -0.5, 0]} receiveShadow>
         <boxGeometry args={[10, 0.1, 10]} />
         <meshStandardMaterial color="gray" />
       </mesh>
-      
-      {/* 🖼️ Future walls/art will go here */}
+
+      {/* 🟩 Left Wall */}
+      <mesh position={[-5, 2, 0]} receiveShadow>
+        <boxGeometry args={[0.1, 4, 10]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+
+      {/* 🟩 Right Wall */}
+      <mesh position={[5, 2, 0]} receiveShadow>
+        <boxGeometry args={[0.1, 4, 10]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+
+      {/* 🟦 Back Wall */}
+      <mesh position={[0, 2, -5]} receiveShadow>
+        <boxGeometry args={[10, 4, 0.1]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+
+      {/* 🔆 Better Lighting */}
+      <pointLight position={[0, 3, 0]} intensity={2} castShadow />
     </group>
   );
 }
