@@ -57,6 +57,16 @@ function Doorway({ position }) {
   );
 }
 
+// Clickable Floor Spot component
+function ClickableSpot({ position, onClick }) {
+  return (
+    <mesh position={position} onClick={onClick} cursor="pointer">
+      <sphereGeometry args={[0.1, 16, 16]} />
+      <meshStandardMaterial color="red" />
+    </mesh>
+  );
+}
+
 export default function Gallery() {
   const cameraRef = useRef();
 
@@ -66,6 +76,13 @@ export default function Gallery() {
     { position: [-10, 0, 0], name: "Left Room", rotation: [0, Math.PI / 2, 0] },
     { position: [10, 0, 0], name: "Right Room", rotation: [0, -Math.PI / 2, 0] }
   ];
+
+  const handleSpotClick = (position) => {
+    console.log('Clicked on position: ', position);
+    if (cameraRef.current) {
+      cameraRef.current.position.set(...position);
+    }
+  };
 
   return (
     <Canvas camera={{ position: [0, 3, 15], fov: 50 }} ref={cameraRef}>
@@ -82,7 +99,9 @@ export default function Gallery() {
         </group>
       ))}
 
-      <OrbitControls />
+      {/* Clickable spots */}
+      <ClickableSpot position={[0, 0.1, 2]} onClick={() => handleSpotClick([0, 1.5, 2])} />
+      <ClickableSpot position={[0, 0.1, -2]} onClick={() => handleSpotClick([0, 1.5, -2])} />
     </Canvas>
   );
 }
