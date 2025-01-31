@@ -60,7 +60,7 @@ function Doorway({ position }) {
 // Clickable Floor Spot component
 function ClickableSpot({ position, onClick }) {
   return (
-    <mesh position={position} onClick={onClick} cursor="pointer">
+    <mesh position={position} onClick={onClick}>
       <sphereGeometry args={[0.1, 16, 16]} />
       <meshStandardMaterial color="red" />
     </mesh>
@@ -81,6 +81,7 @@ export default function Gallery() {
     console.log('Clicked on position: ', position);
     if (cameraRef.current) {
       cameraRef.current.position.set(...position);
+      console.log('Camera moved to: ', cameraRef.current.position);
     }
   };
 
