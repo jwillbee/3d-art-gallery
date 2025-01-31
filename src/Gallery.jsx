@@ -64,4 +64,25 @@ export default function Gallery() {
   const rooms = [
     { position: [0, 0, 0], name: "Main Hall" },
     { position: [-10, 0, 0], name: "Left Room", rotation: [0, Math.PI / 2, 0] },
-    { position: 
+    { position: [10, 0, 0], name: "Right Room", rotation: [0, -Math.PI / 2, 0] }
+  ];
+
+  return (
+    <Canvas camera={{ position: [0, 3, 15], fov: 50 }} ref={cameraRef}>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[2, 5, 2]} />
+
+      {/* Render all rooms */}
+      {rooms.map((room, index) => (
+        <group key={index}>
+          <Room position={room.position} rotation={room.rotation} name={room.name} />
+          {room.position[0] !== 0 && (
+            <Doorway position={room.position[0] < 0 ? [-5.5, 1.5, 0] : [5.5, 1.5, 0]} />
+          )}
+        </group>
+      ))}
+
+      <OrbitControls />
+    </Canvas>
+  );
+}
