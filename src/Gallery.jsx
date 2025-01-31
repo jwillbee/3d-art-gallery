@@ -26,25 +26,25 @@ function Sign({ position, text }) {
 function Room({ position, rotation, name }) {
   return (
     <group position={position} rotation={rotation}>
-      {/* 🟦 Floor */}
+      {/* Floor */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[10, 0.1, 10]} />
         <meshStandardMaterial color="gray" />
       </mesh>
 
-      {/* 🟩 Left Wall */}
+      {/* Left Wall */}
       <mesh position={[-5, 2, 0]} receiveShadow>
         <boxGeometry args={[0.1, 4, 10]} />
         <meshStandardMaterial color="white" />
       </mesh>
 
-      {/* 🟩 Right Wall */}
+      {/* Right Wall */}
       <mesh position={[5, 2, 0]} receiveShadow>
         <boxGeometry args={[0.1, 4, 10]} />
         <meshStandardMaterial color="white" />
       </mesh>
 
-      {/* 🟦 Back Wall */}
+      {/* Back Wall */}
       <mesh position={[0, 2, -5]} receiveShadow>
         <boxGeometry args={[10, 4, 0.1]} />
         <meshStandardMaterial color="white" />
@@ -70,16 +70,6 @@ function Doorway({ position }) {
   );
 }
 
-// Clickable Floor Spot component
-function ClickableSpot({ position, onClick }) {
-  return (
-    <mesh position={position} onClick={onClick} cursor="pointer">
-      <sphereGeometry args={[0.1, 16, 16]} />
-      <meshStandardMaterial color="red" />
-    </mesh>
-  );
-}
-
 export default function Gallery() {
   const cameraRef = useRef();
 
@@ -90,12 +80,8 @@ export default function Gallery() {
     { position: [10, 0, 0], name: "Right Room", rotation: [0, -Math.PI / 2, 0] }
   ];
 
-  const handleSpotClick = (position) => {
-    cameraRef.current.position.set(...position);
-  };
-
   return (
-    <Canvas camera={{ position: [0, 3, 10], fov: 50 }} ref={cameraRef}>
+    <Canvas camera={{ position: [0, 3, 15], fov: 50 }} ref={cameraRef}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 5, 2]} />
 
@@ -103,18 +89,12 @@ export default function Gallery() {
       {rooms.map((room, index) => (
         <group key={index}>
           <Room position={room.position} rotation={room.rotation} name={room.name} />
-          {/* Doorways */}
           {room.position[0] !== 0 && (
             <Doorway position={room.position[0] < 0 ? [-5.5, 1.5, 0] : [5.5, 1.5, 0]} />
           )}
         </group>
       ))}
 
-      {/* Clickable spots */}
-      <ClickableSpot position={[0, 0.1, 2]} onClick={() => handleSpotClick([0, 1.5, 2])} />
-      <ClickableSpot position={[0, 0.1, -2]} onClick={() => handleSpotClick([0, 1.5, -2])} />
-
-      {/* OrbitControls for camera movement */}
       <OrbitControls />
     </Canvas>
   );
