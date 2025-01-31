@@ -1,68 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import { useSpring, animated } from "@react-spring/three";
 
-function ArtFrame({ position, rotation }) {
-  return (
-    <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[1.5, 1, 0.1]} />
-      <meshStandardMaterial color="black" />
-    </mesh>
-  );
-}
+function Room({ position, onClick, isActive }) {
+  const { position: animatedPos } = useSpring({
+    position: isActive ? [0, 0, 0] : position,
+    config: { mass: 1, tension: 170, friction: 26 },
+  });
 
-function GalleryRoom() {
   return (
-    <group>
-      {/* 🟦 Floor (No Gap with Walls) */}
-      <mesh position={[0, -0.05, 0]} receiveShadow>
-        <boxGeometry args={[10, 0.1, 10]} />
+    <animated.group position={animatedPos} onClick={onClick}>
+      {/* Floor */}
+      <mesh position={[0, -0.5, 0]}>
+        <boxGeometry args={[4, 0.1, 4]} />
         <meshStandardMaterial color="gray" />
       </mesh>
-
-      {/* 🟩 Left Wall (Fixed Rotation) */}
-      <mesh position={[-5, 2, 0]} receiveShadow>
-        <boxGeometry args={[0.1, 4, 10]} />
+      {/* Walls */}
+      <mesh position={[0, 1, -2]}>
+        <boxGeometry args={[4, 2, 0.1]} />
         <meshStandardMaterial color="white" />
       </mesh>
-
-      {/* 🟩 Right Wall (Fixed Rotation) */}
-      <mesh position={[5, 2, 0]} receiveShadow>
-        <boxGeometry args={[0.1, 4, 10]} />
+      <mesh position={[2, 1, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[4, 2, 0.1]} />
         <meshStandardMaterial color="white" />
       </mesh>
-
-      {/* 🟦 Back Wall */}
-      <mesh position={[0, 2, -5]} receiveShadow>
-        <boxGeometry args={[10, 4, 0.1]} />
+      <mesh position={[-2, 1, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[4, 2, 0.1]} />
         <meshStandardMaterial color="white" />
       </mesh>
-
-      {/* 🎨 Art Frames on Left Wall (Rotated to Face Inward) */}
-      <ArtFrame position={[-4.9, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[-4.9, 2, 2]} rotation={[0, Math.PI / 2, 0]} />
-
-      {/* 🎨 Art Frames on Right Wall (Rotated to Face Inward) */}
-      <ArtFrame position={[4.9, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
-      <ArtFrame position={[4.9, 2, 2]} rotation={[0, -Math.PI / 2, 0]} />
-
-      {/* 🎨 Art Frames on Back Wall (No Rotation Needed) */}
-      <ArtFrame position={[0, 2, -4.9]} />
-      <ArtFrame position={[2, 2, -4.9]} />
-      <ArtFrame position={[-2, 2, -4.9]} />
-
-      {/* 🔆 Lighting */}
-      <pointLight position={[0, 3, 0]} intensity={2} castShadow />
-    </group>
+      {/* Open Doorway */}
+      <mesh position={[0, 1, 2]}>
+        <boxGeometry args={[1.5, 2, 0.1]} />
+        <meshStandardMaterial color="white" transparent opacity={0.2} />
+      </mesh>
+    </animated.group>
   );
 }
 
 export default function Gallery() {
+  const [activeRoom, setActiveRoom] = useState(0);
+  const rooms = [
+    { position: [0, 0, 0] },
+    { position: [4, 0, 0] },
+    { position: [-4, 0, 0] },
+  ];
+
   return (
-    <Canvas camera={{ position: [0, 2, 6] }}>
+    <Canvas camera={{ position: [0, 2, 5] }}>
       <ambientLight intensity={0.5} />
-      <directionalLight position={[2, 5, 2]} />
-      <GalleryRoom />
+      <directionalLight position={[2, 2, 2]} />
+      {rooms.map((room, index) => (
+        <Room
+          key={index}
+          position={room.position}
+          isActive={index === activeRoom}
+          onClick={() => setActiveRoom(index)}
+        />
+      ))}
       <OrbitControls />
     </Canvas>
   );
