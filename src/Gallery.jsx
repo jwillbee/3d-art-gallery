@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
 // ArtFrame component for displaying the art
 function ArtFrame({ position, rotation }) {
@@ -68,7 +67,7 @@ function ClickableSpot({ position, onClick }) {
 }
 
 export default function Gallery() {
-  const cameraRef = useRef();
+  const { camera } = useThree();
 
   // Rooms configuration
   const rooms = [
@@ -79,14 +78,12 @@ export default function Gallery() {
 
   const handleSpotClick = (position) => {
     console.log('Clicked on position: ', position);
-    if (cameraRef.current) {
-      cameraRef.current.position.set(...position);
-      console.log('Camera moved to: ', cameraRef.current.position);
-    }
+    camera.position.set(...position);
+    console.log('Camera moved to: ', camera.position);
   };
 
   return (
-    <Canvas camera={{ position: [0, 3, 15], fov: 50 }} ref={cameraRef}>
+    <Canvas camera={{ position: [0, 3, 15], fov: 50 }}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 5, 2]} />
 
