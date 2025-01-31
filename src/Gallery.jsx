@@ -46,6 +46,19 @@ function GalleryRoom() {
         <meshStandardMaterial color="white" />
       </mesh>
 
+            {/* 🎨 Art Frames on Left Wall */}
+      <ArtFrame position={[-4.9, 2, -2]} />
+      <ArtFrame position={[-4.9, 2, 2]} />
+
+      {/* 🎨 Art Frames on Right Wall */}
+      <ArtFrame position={[4.9, 2, -2]} />
+      <ArtFrame position={[4.9, 2, 2]} />
+
+      {/* 🎨 Art Frames on Back Wall */}
+      <ArtFrame position={[0, 2, -4.9]} />
+      <ArtFrame position={[2, 2, -4.9]} />
+      <ArtFrame position={[-2, 2, -4.9]} />
+
       {/* 🔆 Better Lighting */}
       <pointLight position={[0, 3, 0]} intensity={2} castShadow />
     </group>
