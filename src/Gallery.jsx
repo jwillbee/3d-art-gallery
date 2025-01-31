@@ -12,18 +12,8 @@ function ArtFrame({ position, rotation }) {
   );
 }
 
-// Sign component for room signs
-function Sign({ position, text }) {
-  return (
-    <mesh position={position}>
-      <textGeometry args={[text, { size: 0.2, height: 0.05 }]} />
-      <meshStandardMaterial color="black" />
-    </mesh>
-  );
-}
-
-// Room component with walls, floor, artframes, and a sign
-function Room({ position, rotation, name }) {
+// Room component with walls, floor, and artframes
+function Room({ position, rotation }) {
   return (
     <group position={position} rotation={rotation}>
       {/* Floor */}
@@ -54,9 +44,6 @@ function Room({ position, rotation, name }) {
       <ArtFrame position={[-4.9, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
       <ArtFrame position={[4.9, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
       <ArtFrame position={[0, 2, -4.9]} />
-
-      {/* Sign */}
-      {name && <Sign position={[0, 3.8, -4.5]} text={name} />}
     </group>
   );
 }
@@ -70,16 +57,6 @@ function Doorway({ position }) {
   );
 }
 
-// Clickable Floor Spot component
-function ClickableSpot({ position, onClick }) {
-  return (
-    <mesh position={position} onClick={onClick} cursor="pointer">
-      <sphereGeometry args={[0.1, 16, 16]} />
-      <meshStandardMaterial color="red" />
-    </mesh>
-  );
-}
-
 export default function Gallery() {
   const cameraRef = useRef();
 
@@ -87,36 +64,4 @@ export default function Gallery() {
   const rooms = [
     { position: [0, 0, 0], name: "Main Hall" },
     { position: [-10, 0, 0], name: "Left Room", rotation: [0, Math.PI / 2, 0] },
-    { position: [10, 0, 0], name: "Right Room", rotation: [0, -Math.PI / 2, 0] }
-  ];
-
-  const handleSpotClick = (position) => {
-    console.log('Clicked on position: ', position);
-    if (cameraRef.current) {
-      cameraRef.current.position.set(...position);
-    }
-  };
-
-  return (
-    <Canvas camera={{ position: [0, 3, 15], fov: 50 }} ref={cameraRef}>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[2, 5, 2]} />
-
-      {/* Render all rooms */}
-      {rooms.map((room, index) => (
-        <group key={index}>
-          <Room position={room.position} rotation={room.rotation} name={room.name} />
-          {room.position[0] !== 0 && (
-            <Doorway position={room.position[0] < 0 ? [-5.5, 1.5, 0] : [5.5, 1.5, 0]} />
-          )}
-        </group>
-      ))}
-
-      {/* Clickable spots */}
-      <ClickableSpot position={[0, 0.1, 2]} onClick={() => handleSpotClick([0, 1.5, 2])} />
-      <ClickableSpot position={[0, 0.1, -2]} onClick={() => handleSpotClick([0, 1.5, -2])} />
-
-      <OrbitControls />
-    </Canvas>
-  );
-}
+    { position: 
