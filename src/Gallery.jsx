@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 
 // ArtFrame component for displaying the art
 function ArtFrame({ position, rotation }) {
@@ -100,6 +101,8 @@ export default function Gallery() {
       {/* Clickable spots */}
       <ClickableSpot position={[0, 0.1, 2]} onClick={() => handleSpotClick([0, 1.5, 2])} />
       <ClickableSpot position={[0, 0.1, -2]} onClick={() => handleSpotClick([0, 1.5, -2])} />
+
+      <OrbitControls />
     </Canvas>
   );
 }
