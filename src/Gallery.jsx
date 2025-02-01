@@ -96,23 +96,21 @@ function CameraController() {
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0) {
-          // Swipe right - move camera left
-          newX -= speed;
-          newRotationY = rotationAngle;
+          // Swipe right - rotate camera right
+          newRotationY -= rotationAngle;
         } else {
-          // Swipe left - move camera right
-          newX += speed;
-          newRotationY = -rotationAngle;
+          // Swipe left - rotate camera left
+          newRotationY += rotationAngle;
         }
       } else {
         if (deltaY > 0) {
-          // Swipe down - move camera backward
-          newZ += speed;
-          newRotationY = MathUtils.degToRad(0); // Reset to face forward
+          // Swipe down - move camera backward in the direction it's facing
+          newX -= Math.sin(newRotationY) * speed;
+          newZ += Math.cos(newRotationY) * speed;
         } else {
-          // Swipe up - move camera forward
-          newZ -= speed;
-          newRotationY = MathUtils.degToRad(0); // Reset to face forward
+          // Swipe up - move camera forward in the direction it's facing
+          newX += Math.sin(newRotationY) * speed;
+          newZ -= Math.cos(newRotationY) * speed;
         }
       }
 
