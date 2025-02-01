@@ -59,85 +59,124 @@ function Doorway({ position }) {
 // CameraController component
 function CameraController() {
   const { camera } = useThree();
-  const startTouch = useRef({ x: 0, y: 0 });
-  const speed = 2; // Adjust the speed as needed
-  const threshold = 30; // Minimum swipe distance to detect
-  const rotationAngle = MathUtils.degToRad(10); // Lower side-to-side rotation angle
+  const touchData = useRef({ startX: 0, startY: 0, isTwoFinger: false });
+  const speed = 1; // Adjust the speed as needed
+  const threshold = 20; // Minimum swipe distance to detect
+  const rotationSpeed = MathUtils.degToRad(1); // Rotation speed per move
 
   // Initialize spring values
   const [{ position, rotationY }, api] = useSpring(() => ({
-    position: [camera.position.x, camera.position.y, camera.position.z],
+    position: camera.position.toArray(),
     rotationY: camera.rotation.y,
     config: { mass: 1, tension: 280, friction: 60 },
   }));
 
   // Update camera position and rotation on each frame
   useFrame(() => {
-    camera.position.lerp(new Vector3(...position.get()), 0.05);
-    camera.rotation.set(0, MathUtils.lerp(camera.rotation.y, rotationY.get(), 0.05), 0);
+    camera.position.lerp(new Vector3(...position.get()), 0.1);
+    camera.rotation.set(0, rotationY.get(), 0);
   });
 
   useEffect(() => {
     const handleTouchStart = (e) => {
-      const touch = e.touches[0];
-      startTouch.current = { x: touch.clientX, y: touch.clientY };
+      e.preventDefault();
+      touchData.current.isTwoFinger = e.touches.length === 2;
+      touchData.current.startX = e.touches[0].clientX;
+      touchData.current.startY = e.touches[0].clientY;
+      
+      if (touchData.current.isTwoFinger) {
+        // For two-finger rotation, store initial positions
+        touchData.current.startX2 = e.touches[1].clientX;
+        touchData.current.startY2 = e.touches[1].clientY;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault();
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+
+      if (touchData.current.isTwoFinger && e.touches.length === 2) {
+        // Two-finger rotation
+        const deltaX = ((currentX + e.touches[1].clientX) / 2) - ((touchData.current.startX + touchData.current.startX2) / 2);
+
+        if (Math.abs(deltaX) > threshold) {
+          let newRotationY = rotationY.get() - deltaX * 0.005;
+
+          // Update rotation
+          api.start({ rotationY: newRotationY });
+          // Update start positions for continuous rotation
+          touchData.current.startX = e.touches[0].clientX;
+          touchData.current.startX2 = e.touches[1].clientX;
+        }
+      } else if (!touchData.current.isTwoFinger) {
+        // Single-finger movement
+        const deltaX = currentX - touchData.current.startX;
+        const deltaY = currentY - touchData.current.startY;
+
+        if (Math.hypot(deltaX, deltaY) < threshold) return;
+
+        let newPosition = [...position.get()];
+        const forward = new Vector3();
+        camera.getWorldDirection(forward);
+
+        // Move forward/backward
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          if (deltaY < 0) {
+            // Swipe up - move forward
+            newPosition[0] += forward.x * speed;
+            newPosition[2] += forward.z * speed;
+          } else {
+            // Swipe down - move backward
+            newPosition[0] -= forward.x * speed;
+            newPosition[2] -= forward.z * speed;
+          }
+        } else {
+          // Strafe left/right
+          const sideways = new Vector3();
+          sideways.crossVectors(camera.up, forward).normalize();
+
+          if (deltaX < 0) {
+            // Swipe left - strafe left
+            newPosition[0] -= sideways.x * speed;
+            newPosition[2] -= sideways.z * speed;
+          } else {
+            // Swipe right - strafe right
+            newPosition[0] += sideways.x * speed;
+            newPosition[2] += sideways.z * speed;
+          }
+        }
+
+        // Clamp positions
+        newPosition[0] = THREE.MathUtils.clamp(newPosition[0], -15, 15);
+        newPosition[2] = THREE.MathUtils.clamp(newPosition[2], -30, 10);
+
+        // Update position
+        api.start({ position: newPosition });
+
+        // Update start positions for continuous movement
+        touchData.current.startX = currentX;
+        touchData.current.startY = currentY;
+      }
     };
 
     const handleTouchEnd = (e) => {
-      const touch = e.changedTouches[0];
-      const deltaX = touch.clientX - startTouch.current.x;
-      const deltaY = touch.clientY - startTouch.current.y;
-
-      if (Math.hypot(deltaX, deltaY) < threshold) return; // Ignore small swipes
-
-      let newX = position.get()[0];
-      let newZ = position.get()[2];
-      let newRotationY = rotationY.get();
-
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (deltaX > 0) {
-          // Swipe right - rotate camera right
-          newRotationY -= rotationAngle;
-        } else {
-          // Swipe left - rotate camera left
-          newRotationY += rotationAngle;
-        }
-      } else {
-        if (deltaY > 0) {
-          // Swipe down - move camera backward in the direction it's facing
-          newX -= Math.sin(newRotationY) * speed;
-          newZ += Math.cos(newRotationY) * speed;
-        } else {
-          // Swipe up - move camera forward in the direction it's facing
-          newX += Math.sin(newRotationY) * speed;
-          newZ -= Math.cos(newRotationY) * speed;
-        }
-      }
-
-      // Clamp positions
-      newX = THREE.MathUtils.clamp(newX, -15, 15);
-      newZ = THREE.MathUtils.clamp(newZ, -30, 10);
-
-      // Ensure y-position remains constant
-      const newY = position.get()[1];
-
-      // Update spring values
-      api.start({
-        position: [newX, newY, newZ],
-        rotationY: newRotationY,
-      });
+      e.preventDefault();
+      touchData.current.isTwoFinger = false;
     };
 
     // Add event listeners
-    window.addEventListener('touchstart', handleTouchStart);
-    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     // Cleanup
     return () => {
       window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [api, position, rotationY, speed, threshold, rotationAngle]);
+  }, [api, position, rotationY, speed, threshold]);
 
   return null;
 }
