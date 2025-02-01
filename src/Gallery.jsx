@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { MathUtils } from 'three';
-import { useSpring } from '@react-spring/three';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { MathUtils, Vector3, Euler } from 'three';
+import { useSpring, animated } from '@react-spring/three';
 import * as THREE from 'three';
 
 // ArtFrame component
@@ -63,28 +63,18 @@ function CameraController() {
   const speed = 5; // Adjust the speed as needed
   const threshold = 30; // Minimum swipe distance to detect
 
-  // Initialize the spring at the top level
-  const [{ position, rotationY }, setSpring] = useSpring(() => ({
+  // Initialize spring values
+  const [{ position, rotationY }, api] = useSpring(() => ({
     position: [camera.position.x, camera.position.y, camera.position.z],
     rotationY: camera.rotation.y,
     config: { mass: 1, tension: 280, friction: 60 },
-  }), [camera]);
+  }));
 
-  // Update the camera when the spring values change
-  useEffect(() => {
-    const unsubscribePosition = position.onChange((val) => {
-      camera.position.set(...val);
-    });
-    const unsubscribeRotation = rotationY.onChange((val) => {
-      camera.rotation.y = val;
-    });
-
-    // Cleanup
-    return () => {
-      unsubscribePosition();
-      unsubscribeRotation();
-    };
-  }, [position, rotationY, camera]);
+  // Update camera position and rotation on each frame
+  useFrame(() => {
+    camera.position.lerp(new Vector3(...position.get()), 0.1);
+    camera.rotation.y = MathUtils.lerp(camera.rotation.y, rotationY.get(), 0.1);
+  });
 
   useEffect(() => {
     const handleTouchStart = (e) => {
@@ -99,9 +89,9 @@ function CameraController() {
 
       if (Math.hypot(deltaX, deltaY) < threshold) return; // Ignore small swipes
 
-      let newX = camera.position.x;
-      let newZ = camera.position.z;
-      let newRotationY = camera.rotation.y;
+      let newX = position.get()[0];
+      let newZ = position.get()[2];
+      let newRotationY = rotationY.get();
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0) {
@@ -129,8 +119,8 @@ function CameraController() {
       newX = THREE.MathUtils.clamp(newX, -15, 15);
       newZ = THREE.MathUtils.clamp(newZ, -30, 10);
 
-      // Update camera with smooth transition
-      setSpring.start({
+      // Update spring values
+      api.start({
         position: [newX, camera.position.y, newZ],
         rotationY: newRotationY,
       });
@@ -145,7 +135,7 @@ function CameraController() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [camera, speed, threshold, setSpring]);
+  }, [api, position, rotationY, speed, threshold]);
 
   return null;
 }
