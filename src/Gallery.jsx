@@ -9,7 +9,7 @@ function ArtFrame({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={[1.5, 1, 0.1]} />
-      <meshStandardMaterial color="black" />
+      <meshStandardMaterial color='black' />
     </mesh>
   );
 }
@@ -21,22 +21,22 @@ function Room() {
       {/* Floor */}
       <mesh position={[0, -0.05, 0]}>
         <boxGeometry args={[10, 0.1, 10]} />
-        <meshStandardMaterial color="gray" />
+        <meshStandardMaterial color='gray' />
       </mesh>
       {/* Left Wall */}
       <mesh position={[-5, 2, 0]}>
         <boxGeometry args={[0.1, 4, 10]} />
-        <meshStandardMaterial color="white" />
+        <meshStandardMaterial color='white' />
       </mesh>
       {/* Right Wall */}
       <mesh position={[5, 2, 0]}>
         <boxGeometry args={[0.1, 4, 10]} />
-        <meshStandardMaterial color="white" />
+        <meshStandardMaterial color='white' />
       </mesh>
       {/* Back Wall */}
       <mesh position={[0, 2, -5]}>
         <boxGeometry args={[10, 4, 0.1]} />
-        <meshStandardMaterial color="white" />
+        <meshStandardMaterial color='white' />
       </mesh>
       {/* Art Frames */}
       <ArtFrame position={[-4.9, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
@@ -51,7 +51,7 @@ function Doorway({ position }) {
   return (
     <mesh position={position}>
       <boxGeometry args={[1, 3, 0.1]} />
-      <meshStandardMaterial color="brown" />
+      <meshStandardMaterial color='brown' />
     </mesh>
   );
 }
@@ -63,28 +63,28 @@ function CameraController() {
   const speed = 5; // Adjust the speed as needed
   const threshold = 30; // Minimum swipe distance to detect
 
-  const setCameraPosition = (newPosition, newRotationY) => {
-    // Clamp positions
-    const clampedX = THREE.MathUtils.clamp(newPosition.x, -15, 15);
-    const clampedZ = THREE.MathUtils.clamp(newPosition.z, -30, 10);
+  // Initialize the spring at the top level
+  const [{ position, rotationY }, setSpring] = useSpring(() => ({
+    position: [camera.position.x, camera.position.y, camera.position.z],
+    rotationY: camera.rotation.y,
+    config: { mass: 1, tension: 280, friction: 60 },
+  }), [camera]);
 
-    // Animate position and rotation
-    useSpring({
-      from: {
-        position: camera.position.clone(),
-        rotationY: camera.rotation.y,
-      },
-      to: {
-        position: new THREE.Vector3(clampedX, camera.position.y, clampedZ),
-        rotationY: newRotationY,
-      },
-      config: { mass: 1, tension: 280, friction: 60 },
-      onChange: ({ value }) => {
-        camera.position.copy(value.position);
-        camera.rotation.y = value.rotationY;
-      },
+  // Update the camera when the spring values change
+  useEffect(() => {
+    const unsubscribePosition = position.onChange((val) => {
+      camera.position.set(...val);
     });
-  };
+    const unsubscribeRotation = rotationY.onChange((val) => {
+      camera.rotation.y = val;
+    });
+
+    // Cleanup
+    return () => {
+      unsubscribePosition();
+      unsubscribeRotation();
+    };
+  }, [position, rotationY, camera]);
 
   useEffect(() => {
     const handleTouchStart = (e) => {
@@ -99,33 +99,41 @@ function CameraController() {
 
       if (Math.hypot(deltaX, deltaY) < threshold) return; // Ignore small swipes
 
-      let newPosition = camera.position.clone();
+      let newX = camera.position.x;
+      let newZ = camera.position.z;
       let newRotationY = camera.rotation.y;
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0) {
           // Swipe right - move camera left
-          newPosition.x -= speed;
+          newX -= speed;
           newRotationY = MathUtils.degToRad(90);
         } else {
           // Swipe left - move camera right
-          newPosition.x += speed;
+          newX += speed;
           newRotationY = MathUtils.degToRad(-90);
         }
       } else {
         if (deltaY > 0) {
           // Swipe down - move camera backward
-          newPosition.z += speed;
+          newZ += speed;
           newRotationY = MathUtils.degToRad(180);
         } else {
           // Swipe up - move camera forward
-          newPosition.z -= speed;
+          newZ -= speed;
           newRotationY = 0;
         }
       }
 
+      // Clamp positions
+      newX = THREE.MathUtils.clamp(newX, -15, 15);
+      newZ = THREE.MathUtils.clamp(newZ, -30, 10);
+
       // Update camera with smooth transition
-      setCameraPosition(newPosition, newRotationY);
+      setSpring.start({
+        position: [newX, camera.position.y, newZ],
+        rotationY: newRotationY,
+      });
     };
 
     // Add event listeners
@@ -137,7 +145,7 @@ function CameraController() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [camera]);
+  }, [camera, speed, threshold, setSpring]);
 
   return null;
 }
