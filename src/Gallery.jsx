@@ -60,7 +60,7 @@ function Doorway({ position }) {
 function CameraController() {
   const { camera } = useThree();
   const startTouch = useRef({ x: 0, y: 0 });
-  const speed = 5; // Adjust the speed as needed
+  const speed = 2; // Adjust the speed as needed
   const threshold = 30; // Minimum swipe distance to detect
 
   // Initialize spring values
@@ -72,8 +72,8 @@ function CameraController() {
 
   // Update camera position and rotation on each frame
   useFrame(() => {
-    camera.position.lerp(new Vector3(...position.get()), 0.1);
-    camera.rotation.y = MathUtils.lerp(camera.rotation.y, rotationY.get(), 0.1);
+    camera.position.lerp(new Vector3(...position.get()), 0.05);
+    camera.rotation.y = MathUtils.lerp(camera.rotation.y, rotationY.get(), 0.05);
   });
 
   useEffect(() => {
@@ -97,17 +97,17 @@ function CameraController() {
         if (deltaX > 0) {
           // Swipe right - move camera left
           newX -= speed;
-          newRotationY = MathUtils.degToRad(90);
+          newRotationY = MathUtils.degToRad(45);
         } else {
           // Swipe left - move camera right
           newX += speed;
-          newRotationY = MathUtils.degToRad(-90);
+          newRotationY = MathUtils.degToRad(-45);
         }
       } else {
         if (deltaY > 0) {
           // Swipe down - move camera backward
           newZ += speed;
-          newRotationY = MathUtils.degToRad(180);
+          newRotationY = MathUtils.degToRad(90);
         } else {
           // Swipe up - move camera forward
           newZ -= speed;
