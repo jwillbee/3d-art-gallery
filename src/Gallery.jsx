@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Vector3 } from "three";
+import { Vector3, MathUtils } from "three";
+import { animated, useSpring } from "@react-spring/three";
 
 // ArtFrame component for displaying the art
 function ArtFrame({ position, rotation }) {
@@ -60,8 +61,25 @@ function Doorway({ position }) {
 // CameraController component to handle touch events
 function CameraController() {
   const { camera } = useThree();
-  const speed = 1; // Adjust speed as needed
+  const speed = 2; // Adjust speed as needed
   const startTouch = useRef({ x: 0, y: 0 });
+
+  const [springProps, setSpringProps] = useSpring(() => ({
+    position: [camera.position.x, camera.position.y, camera.position.z],
+  }));
+
+  const moveCamera = (deltaX, deltaY) => {
+    setSpringProps({
+      position: [
+        MathUtils.clamp(camera.position.x + deltaX, -15, 15),
+        camera.position.y,
+        MathUtils.clamp(camera.position.z + deltaY, -30, 10),
+      ],
+      onFrame: ({ position }) => {
+        camera.position.set(position[0], position[1], position[2]);
+      },
+    });
+  };
 
   useEffect(() => {
     const handleTouchStart = (e) => {
@@ -82,28 +100,24 @@ function CameraController() {
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > threshold) {
           // Swipe right
-          camera.position.add(new Vector3(-speed, 0, 0));
+          moveCamera(-speed, 0);
           console.log("Swiped Right");
         } else if (deltaX < -threshold) {
           // Swipe left
-          camera.position.add(new Vector3(speed, 0, 0));
+          moveCamera(speed, 0);
           console.log("Swiped Left");
         }
       } else {
         if (deltaY > threshold) {
           // Swipe down
-          camera.position.add(new Vector3(0, 0, speed));
+          moveCamera(0, speed);
           console.log("Swiped Down");
         } else if (deltaY < -threshold) {
           // Swipe up
-          camera.position.add(new Vector3(0, 0, -speed));
+          moveCamera(0, -speed);
           console.log("Swiped Up");
         }
       }
-
-      // Clamp the camera position to keep it within gallery boundaries
-      camera.position.x = THREE.MathUtils.clamp(camera.position.x, -15, 15);
-      camera.position.z = THREE.MathUtils.clamp(camera.position.z, -30, 10);
     };
 
     window.addEventListener("touchstart", handleTouchStart);
@@ -113,7 +127,7 @@ function CameraController() {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [camera]);
+  }, [camera, setSpringProps]);
 
   return null;
 }
