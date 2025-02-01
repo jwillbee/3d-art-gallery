@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MathUtils, Vector3, Euler } from 'three';
+import { MathUtils, Vector3 } from 'three';
 import { useSpring, animated } from '@react-spring/three';
 import * as THREE from 'three';
 
@@ -62,6 +62,7 @@ function CameraController() {
   const startTouch = useRef({ x: 0, y: 0 });
   const speed = 2; // Adjust the speed as needed
   const threshold = 30; // Minimum swipe distance to detect
+  const rotationAngle = MathUtils.degToRad(10); // Lower side-to-side rotation angle
 
   // Initialize spring values
   const [{ position, rotationY }, api] = useSpring(() => ({
@@ -97,21 +98,21 @@ function CameraController() {
         if (deltaX > 0) {
           // Swipe right - move camera left
           newX -= speed;
-          newRotationY = MathUtils.degToRad(45);
+          newRotationY = rotationAngle;
         } else {
           // Swipe left - move camera right
           newX += speed;
-          newRotationY = MathUtils.degToRad(-45);
+          newRotationY = -rotationAngle;
         }
       } else {
         if (deltaY > 0) {
           // Swipe down - move camera backward
           newZ += speed;
-          newRotationY = MathUtils.degToRad(90);
+          newRotationY = MathUtils.degToRad(0); // Reset to face forward
         } else {
           // Swipe up - move camera forward
           newZ -= speed;
-          newRotationY = 0;
+          newRotationY = MathUtils.degToRad(0); // Reset to face forward
         }
       }
 
@@ -119,9 +120,12 @@ function CameraController() {
       newX = THREE.MathUtils.clamp(newX, -15, 15);
       newZ = THREE.MathUtils.clamp(newZ, -30, 10);
 
+      // Ensure y-position remains constant
+      const newY = position.get()[1];
+
       // Update spring values
       api.start({
-        position: [newX, camera.position.y, newZ],
+        position: [newX, newY, newZ],
         rotationY: newRotationY,
       });
     };
@@ -135,7 +139,7 @@ function CameraController() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [api, position, rotationY, speed, threshold]);
+  }, [api, position, rotationY, speed, threshold, rotationAngle]);
 
   return null;
 }
