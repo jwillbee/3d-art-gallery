@@ -8,61 +8,98 @@ import * as THREE from 'three';
 function ArtFrame({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[1.5, 1, 0.1]} />
+      <boxGeometry args={[1.5, 1.5, 0.1]} /> {/* Increased height of frames */}
       <meshStandardMaterial color='black' />
     </mesh>
   );
 }
 
-// Room component
-function Room() {
+// Wall component with an opening (doorway)
+function WallWithOpening({ position, rotation }) {
   return (
-    <group>
-      {/* Floor */}
-      <mesh position={[0, -0.05, 0]}>
-        <boxGeometry args={[10, 0.1, 10]} />
-        <meshStandardMaterial color='gray' />
-      </mesh>
-      {/* Left Wall */}
-      <mesh position={[-5, 2, 0]}>
-        <boxGeometry args={[0.1, 4, 10]} />
+    <group position={position} rotation={rotation}>
+      {/* Left segment of the wall */}
+      <mesh position={[-3.5, 2.5, 0]}>
+        <boxGeometry args={[3, 5, 0.1]} />
         <meshStandardMaterial color='white' />
       </mesh>
-      {/* Right Wall */}
-      <mesh position={[5, 2, 0]}>
-        <boxGeometry args={[0.1, 4, 10]} />
+      {/* Right segment of the wall */}
+      <mesh position={[3.5, 2.5, 0]}>
+        <boxGeometry args={[3, 5, 0.1]} />
         <meshStandardMaterial color='white' />
       </mesh>
-      {/* Back Wall */}
-      <mesh position={[0, 2, -5]}>
-        <boxGeometry args={[10, 4, 0.1]} />
-        <meshStandardMaterial color='white' />
-      </mesh>
-      {/* Art Frames */}
-      <ArtFrame position={[-4.9, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[4.9, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
-      <ArtFrame position={[0, 2, -4.9]} />
     </group>
   );
 }
 
-// Doorway component
-function Doorway({ position }) {
+// Solid wall component without openings
+function Wall({ position, rotation }) {
   return (
-    <mesh position={position}>
-      <boxGeometry args={[1, 3, 0.1]} />
-      <meshStandardMaterial color='brown' />
+    <mesh position={position} rotation={rotation}>
+      <boxGeometry args={[10, 5, 0.1]} />
+      <meshStandardMaterial color='white' />
     </mesh>
   );
 }
 
-// CameraController component
+// Ceiling component
+function Ceiling({ position }) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={[10, 0.1, 10]} />
+      <meshStandardMaterial color='white' />
+    </mesh>
+  );
+}
+
+// Room component
+function Room({ position }) {
+  return (
+    <group position={position}>
+      {/* Floor */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[10, 0.1, 10]} />
+        <meshStandardMaterial color='lightgray' />
+      </mesh>
+
+      {/* Left Wall */}
+      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+
+      {/* Right Wall */}
+      <Wall position={[5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+
+      {/* Back Wall with Opening */}
+      <WallWithOpening position={[0, 2.5, -5]} />
+
+      {/* Front Wall with Opening */}
+      <WallWithOpening position={[0, 2.5, 5]} rotation={[0, Math.PI, 0]} />
+
+      {/* Ceiling */}
+      <Ceiling position={[0, 5, 0]} />
+
+      {/* Art Frames */}
+      <ArtFrame position={[-4.5, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
+      <ArtFrame position={[4.5, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
+      <ArtFrame position={[0, 2, -4.5]} />
+    </group>
+  );
+}
+
+// Camera Controller Component with Collision Detection
 function CameraController() {
   const { camera } = useThree();
   const touchData = useRef({ startX: 0, startY: 0, isTwoFinger: false });
-  const speed = 1; // Adjust the speed as needed
-  const threshold = 20; // Minimum swipe distance to detect
-  const rotationSpeed = MathUtils.degToRad(1); // Rotation speed per move
+  const speed = 0.5; // Movement speed
+  const threshold = 20; // Gesture threshold
+
+  // Define the walkable boundaries for each area
+  const boundaries = [
+    { xMin: -5, xMax: 5, zMin: -25, zMax: 25 }, // Main Hall
+    { xMin: -15, xMax: -5, zMin: -15, zMax: -5 }, // Left Room 1
+    { xMin: 5, xMax: 15, zMin: -15, zMax: -5 }, // Right Room 1
+    { xMin: -15, xMax: -5, zMin: 5, zMax: 15 }, // Left Room 2
+    { xMin: 5, xMax: 15, zMin: 5, zMax: 15 }, // Right Room 2
+  ];
 
   // Initialize spring values
   const [{ position, rotationY }, api] = useSpring(() => ({
@@ -83,9 +120,8 @@ function CameraController() {
       touchData.current.isTwoFinger = e.touches.length === 2;
       touchData.current.startX = e.touches[0].clientX;
       touchData.current.startY = e.touches[0].clientY;
-      
-      if (touchData.current.isTwoFinger) {
-        // For two-finger rotation, store initial positions
+
+      if (touchData.current.isTwoFinger && e.touches.length === 2) {
         touchData.current.startX2 = e.touches[1].clientX;
         touchData.current.startY2 = e.touches[1].clientY;
       }
@@ -100,15 +136,14 @@ function CameraController() {
         // Two-finger rotation
         const deltaX = ((currentX + e.touches[1].clientX) / 2) - ((touchData.current.startX + touchData.current.startX2) / 2);
 
-        if (Math.abs(deltaX) > threshold) {
-          let newRotationY = rotationY.get() - deltaX * 0.005;
+        let newRotationY = rotationY.get() - deltaX * 0.005;
 
-          // Update rotation
-          api.start({ rotationY: newRotationY });
-          // Update start positions for continuous rotation
-          touchData.current.startX = e.touches[0].clientX;
-          touchData.current.startX2 = e.touches[1].clientX;
-        }
+        // Update rotation
+        api.start({ rotationY: newRotationY });
+
+        // Update start positions for continuous rotation
+        touchData.current.startX = e.touches[0].clientX;
+        touchData.current.startX2 = e.touches[1].clientX;
       } else if (!touchData.current.isTwoFinger) {
         // Single-finger movement
         const deltaX = currentX - touchData.current.startX;
@@ -147,12 +182,11 @@ function CameraController() {
           }
         }
 
-        // Clamp positions
-        newPosition[0] = THREE.MathUtils.clamp(newPosition[0], -15, 15);
-        newPosition[2] = THREE.MathUtils.clamp(newPosition[2], -30, 10);
-
-        // Update position
-        api.start({ position: newPosition });
+        // Collision detection: Check if newPosition is within boundaries
+        if (isWithinBoundaries(newPosition)) {
+          // Update position
+          api.start({ position: newPosition });
+        }
 
         // Update start positions for continuous movement
         touchData.current.startX = currentX;
@@ -163,6 +197,21 @@ function CameraController() {
     const handleTouchEnd = (e) => {
       e.preventDefault();
       touchData.current.isTwoFinger = false;
+    };
+
+    // Collision detection function
+    const isWithinBoundaries = (pos) => {
+      for (const boundary of boundaries) {
+        if (
+          pos[0] >= boundary.xMin &&
+          pos[0] <= boundary.xMax &&
+          pos[2] >= boundary.zMin &&
+          pos[2] <= boundary.zMax
+        ) {
+          return true;
+        }
+      }
+      return false;
     };
 
     // Add event listeners
@@ -182,32 +231,48 @@ function CameraController() {
 }
 
 // Main Gallery component
-export default function Gallery() {
-  const rooms = [
-    { position: [0, 0, 0] },
-    { position: [-10, 0, 0] },
-    { position: [10, 0, 0] },
-  ];
-
+export default function GalleryApp() {
   return (
-    <Canvas camera={{ position: [0, 2, 10], fov: 75 }}>
+    <Canvas camera={{ position: [0, 2, 0], fov: 75 }}>
       {/* Camera Controller */}
       <CameraController />
 
       {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[0, 10, 5]} intensity={1} />
+      <ambientLight intensity={0.3} />
+      <pointLight position={[0, 5, 0]} intensity={0.8} />
 
-      {/* Rooms */}
-      {rooms.map((room, index) => (
-        <group key={index} position={room.position}>
-          <Room />
-          {/* Doorways */}
-          {index !== 0 && (
-            <Doorway position={[room.position[0] > 0 ? -5 : 5, 1.5, 0]} />
-          )}
-        </group>
-      ))}
+      {/* Main Hall (Longer Hallway) */}
+      <group position={[0, 0, 0]}>
+        {/* Main Hall Floor */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[10, 0.1, 50]} />
+          <meshStandardMaterial color='lightgray' />
+        </mesh>
+        {/* Left Wall */}
+        <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+        {/* Right Wall */}
+        <Wall position={[5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+        {/* Back Wall */}
+        <Wall position={[0, 2.5, -25]} />
+        {/* Front Wall */}
+        <Wall position={[0, 2.5, 25]} rotation={[0, Math.PI, 0]} />
+
+        {/* Ceiling */}
+        <Ceiling position={[0, 5, 0]} args={[10, 0.1, 50]} />
+
+        {/* Art Frames along the hallway */}
+        <ArtFrame position={[-4.5, 2, -20]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.5, 2, -10]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.5, 2, 0]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.5, 2, 10]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.5, 2, 20]} rotation={[0, Math.PI / 2, 0]} />
+      </group>
+
+      {/* Additional Rooms */}
+      <Room position={[-10, 0, -10]} /> {/* Left Room 1 */}
+      <Room position={[10, 0, -10]} /> {/* Right Room 1 */}
+      <Room position={[-10, 0, 10]} /> {/* Left Room 2 */}
+      <Room position={[10, 0, 10]} /> {/* Right Room 2 */}
     </Canvas>
   );
 }
