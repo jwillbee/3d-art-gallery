@@ -1,38 +1,48 @@
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MathUtils, Vector3 } from 'three';
+import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 
-// ArtFrame component
+// ArtFrame component for displaying the art
 function ArtFrame({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[1.5, 1.5, 0.1]} /> {/* Increased height of frames */}
+      <boxGeometry args={[1.5, 1.5, 0.1]} />
       <meshStandardMaterial color='black' />
     </mesh>
   );
 }
 
-// Wall component with an opening (doorway)
-function WallWithOpening({ position, rotation }) {
+// Sign component for the welcome sign
+function WelcomeSign({ position }) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={[4, 1, 0.1]} />
+      <meshStandardMaterial color='white' />
+    </mesh>
+  );
+}
+
+// Wall component with an opening centered from the side room's perspective
+function WallWithCenteredOpening({ position, rotation }) {
   return (
     <group position={position} rotation={rotation}>
       {/* Left segment of the wall */}
-      <mesh position={[-3.5, 2.5, 0]}>
-        <boxGeometry args={[3, 5, 0.1]} />
+      <mesh position={[-2.5, 2.5, 0]}>
+        <boxGeometry args={[5, 5, 0.1]} />
         <meshStandardMaterial color='white' />
       </mesh>
       {/* Right segment of the wall */}
-      <mesh position={[3.5, 2.5, 0]}>
-        <boxGeometry args={[3, 5, 0.1]} />
+      <mesh position={[2.5, 2.5, 0]}>
+        <boxGeometry args={[5, 5, 0.1]} />
         <meshStandardMaterial color='white' />
       </mesh>
     </group>
   );
 }
 
-// Solid wall component without openings
+// Wall component without openings
 function Wall({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
@@ -43,10 +53,10 @@ function Wall({ position, rotation }) {
 }
 
 // Ceiling component
-function Ceiling({ position }) {
+function Ceiling({ position, size }) {
   return (
     <mesh position={position}>
-      <boxGeometry args={[10, 0.1, 10]} />
+      <boxGeometry args={size} />
       <meshStandardMaterial color='white' />
     </mesh>
   );
@@ -68,19 +78,19 @@ function Room({ position }) {
       {/* Right Wall */}
       <Wall position={[5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
 
-      {/* Back Wall with Opening */}
-      <WallWithOpening position={[0, 2.5, -5]} />
+      {/* Back Wall */}
+      <Wall position={[0, 2.5, -5]} />
 
-      {/* Front Wall with Opening */}
-      <WallWithOpening position={[0, 2.5, 5]} rotation={[0, Math.PI, 0]} />
+      {/* Front Wall with centered opening */}
+      <WallWithCenteredOpening position={[0, 2.5, 5]} rotation={[0, Math.PI, 0]} />
 
       {/* Ceiling */}
-      <Ceiling position={[0, 5, 0]} />
+      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 10]} />
 
-      {/* Art Frames */}
-      <ArtFrame position={[-4.5, 2, -2]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[4.5, 2, -2]} rotation={[0, -Math.PI / 2, 0]} />
-      <ArtFrame position={[0, 2, -4.5]} />
+      {/* Art Frames closer to the walls */}
+      <ArtFrame position={[-4.9, 2.5, -2]} rotation={[0, Math.PI / 2, 0]} />
+      <ArtFrame position={[4.9, 2.5, -2]} rotation={[0, -Math.PI / 2, 0]} />
+      <ArtFrame position={[0, 2.5, -4.9]} />
     </group>
   );
 }
@@ -92,13 +102,11 @@ function CameraController() {
   const speed = 0.5; // Movement speed
   const threshold = 20; // Gesture threshold
 
-  // Define the walkable boundaries for each area
+  // Define the walkable boundaries
   const boundaries = [
-    { xMin: -5, xMax: 5, zMin: -25, zMax: 25 }, // Main Hall
-    { xMin: -15, xMax: -5, zMin: -15, zMax: -5 }, // Left Room 1
-    { xMin: 5, xMax: 15, zMin: -15, zMax: -5 }, // Right Room 1
-    { xMin: -15, xMax: -5, zMin: 5, zMax: 15 }, // Left Room 2
-    { xMin: 5, xMax: 15, zMin: 5, zMax: 15 }, // Right Room 2
+    { xMin: -5, xMax: 5, zMin: -15, zMax: 15 }, // Main Hall
+    { xMin: -15, xMax: -5, zMin: -5, zMax: 5 }, // Left Room
+    { xMin: 5, xMax: 15, zMin: -5, zMax: 5 }, // Right Room
   ];
 
   // Initialize spring values
@@ -232,8 +240,10 @@ function CameraController() {
 
 // Main Gallery component
 export default function GalleryApp() {
+  const cameraStartPosition = [0, 2, -14]; // Start at one end of the hallway, facing down the hall
+
   return (
-    <Canvas camera={{ position: [0, 2, 0], fov: 75 }}>
+    <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
       {/* Camera Controller */}
       <CameraController />
 
@@ -241,38 +251,53 @@ export default function GalleryApp() {
       <ambientLight intensity={0.3} />
       <pointLight position={[0, 5, 0]} intensity={0.8} />
 
-      {/* Main Hall (Longer Hallway) */}
+      {/* Main Hall */}
       <group position={[0, 0, 0]}>
-        {/* Main Hall Floor */}
+        {/* Floor */}
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[10, 0.1, 50]} />
+          <boxGeometry args={[10, 0.1, 30]} />
           <meshStandardMaterial color='lightgray' />
         </mesh>
+
         {/* Left Wall */}
         <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+
         {/* Right Wall */}
         <Wall position={[5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+
         {/* Back Wall */}
-        <Wall position={[0, 2.5, -25]} />
+        <Wall position={[0, 2.5, -15]} />
+
         {/* Front Wall */}
-        <Wall position={[0, 2.5, 25]} rotation={[0, Math.PI, 0]} />
+        <Wall position={[0, 2.5, 15]} rotation={[0, Math.PI, 0]} />
+
+        {/* Openings to side rooms */}
+        <WallWithCenteredOpening position={[-5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} /> {/* Left wall opening */}
+        <WallWithCenteredOpening position={[5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} /> {/* Right wall opening */}
 
         {/* Ceiling */}
-        <Ceiling position={[0, 5, 0]} args={[10, 0.1, 50]} />
+        <Ceiling position={[0, 5, 0]} size={[10, 0.1, 30]} />
 
-        {/* Art Frames along the hallway */}
-        <ArtFrame position={[-4.5, 2, -20]} rotation={[0, Math.PI / 2, 0]} />
-        <ArtFrame position={[-4.5, 2, -10]} rotation={[0, Math.PI / 2, 0]} />
-        <ArtFrame position={[-4.5, 2, 0]} rotation={[0, Math.PI / 2, 0]} />
-        <ArtFrame position={[-4.5, 2, 10]} rotation={[0, Math.PI / 2, 0]} />
-        <ArtFrame position={[-4.5, 2, 20]} rotation={[0, Math.PI / 2, 0]} />
+        {/* Art Frames along the hallway, closer to the walls */}
+        <ArtFrame position={[-4.9, 2.5, -10]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.9, 2.5, -5]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.9, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.9, 2.5, 5]} rotation={[0, Math.PI / 2, 0]} />
+        <ArtFrame position={[-4.9, 2.5, 10]} rotation={[0, Math.PI / 2, 0]} />
+
+        {/* Welcome Sign */}
+        <WelcomeSign position={[0, 4, -14.9]} />
+
+        {/* Placeholder for other gallery items */}
+        <mesh position={[0, 0.6, -12]}>
+          <boxGeometry args={[1, 1.2, 1]} />
+          <meshStandardMaterial color='gray' />
+        </mesh>
       </group>
 
-      {/* Additional Rooms */}
-      <Room position={[-10, 0, -10]} /> {/* Left Room 1 */}
-      <Room position={[10, 0, -10]} /> {/* Right Room 1 */}
-      <Room position={[-10, 0, 10]} /> {/* Left Room 2 */}
-      <Room position={[10, 0, 10]} /> {/* Right Room 2 */}
+      {/* Side Rooms */}
+      <Room position={[-10, 0, 0]} /> {/* Left Room */}
+      <Room position={[10, 0, 0]} />  {/* Right Room */}
     </Canvas>
   );
 }
