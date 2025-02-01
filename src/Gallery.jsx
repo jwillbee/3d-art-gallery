@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { MathUtils, Vector3 } from 'three';
-import { useSpring, animated } from '@react-spring/three';
+import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 
 // ArtFrame component
@@ -74,7 +74,7 @@ function CameraController() {
   // Update camera position and rotation on each frame
   useFrame(() => {
     camera.position.lerp(new Vector3(...position.get()), 0.05);
-    camera.rotation.y = MathUtils.lerp(camera.rotation.y, rotationY.get(), 0.05);
+    camera.rotation.set(0, MathUtils.lerp(camera.rotation.y, rotationY.get(), 0.05), 0);
   });
 
   useEffect(() => {
