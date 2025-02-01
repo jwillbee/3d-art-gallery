@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import React, { useRef, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Vector3 } from "three";
 
 // ArtFrame component for displaying the art
 function ArtFrame({ position, rotation }) {
@@ -57,31 +57,74 @@ function Doorway({ position }) {
   );
 }
 
-// Clickable Floor Spot component
-function ClickableSpot({ position, onClick }) {
-  return (
-    <mesh position={position} onClick={onClick}>
-      <sphereGeometry args={[0.1, 16, 16]} />
-      <meshStandardMaterial color="red" />
-    </mesh>
-  );
-}
-
 export default function Gallery() {
   const { camera } = useThree();
+  const speed = 0.1;
 
-  // Rooms configuration
-  const rooms = [
-    { position: [0, 0, 0], name: "Main Hall" },
-    { position: [-10, 0, 0], name: "Left Room", rotation: [0, Math.PI / 2, 0] },
-    { position: [10, 0, 0], name: "Right Room", rotation: [0, -Math.PI / 2, 0] }
-  ];
-
-  const handleSpotClick = (position) => {
-    console.log('Clicked on position: ', position);
-    camera.position.set(...position);
-    console.log('Camera moved to: ', camera.position);
+  const handleKeyDown = (event) => {
+    switch (event.key) {
+      case "ArrowUp":
+        camera.position.add(new Vector3(0, 0, -speed));
+        break;
+      case "ArrowDown":
+        camera.position.add(new Vector3(0, 0, speed));
+        break;
+      case "ArrowLeft":
+        camera.position.add(new Vector3(-speed, 0, 0));
+        break;
+      case "ArrowRight":
+        camera.position.add(new Vector3(speed, 0, 0));
+        break;
+      default:
+        break;
+    }
   };
+
+  const handleTouchStart = useRef(null);
+  const handleTouchEnd = useRef(null);
+  const startTouch = useRef({ x: 0, y: 0 });
+
+  const handleTouchStartFn = (e) => {
+    const touch = e.touches[0];
+    startTouch.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEndFn = (e) => {
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - startTouch.current.x;
+    const deltaY = touch.clientY - startTouch.current.y;
+    const threshold = 50;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > threshold) {
+        // Swipe right
+        camera.position.add(new Vector3(speed, 0, 0));
+      } else if (deltaX < -threshold) {
+        // Swipe left
+        camera.position.add(new Vector3(-speed, 0, 0));
+      }
+    } else {
+      if (deltaY > threshold) {
+        // Swipe down
+        camera.position.add(new Vector3(0, 0, speed));
+      } else if (deltaY < -threshold) {
+        // Swipe up
+        camera.position.add(new Vector3(0, 0, -speed));
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("touchstart", handleTouchStartFn);
+    window.addEventListener("touchend", handleTouchEndFn);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStartFn);
+      window.removeEventListener("touchend", handleTouchEndFn);
+    };
+  }, []);
 
   return (
     <Canvas camera={{ position: [0, 3, 15], fov: 50 }}>
@@ -91,18 +134,12 @@ export default function Gallery() {
       {/* Render all rooms */}
       {rooms.map((room, index) => (
         <group key={index}>
-          <Room position={room.position} rotation={room.rotation} name={room.name} />
+          <Room position={room.position} rotation={room.rotation} />
           {room.position[0] !== 0 && (
             <Doorway position={room.position[0] < 0 ? [-5.5, 1.5, 0] : [5.5, 1.5, 0]} />
           )}
         </group>
       ))}
-
-      {/* Clickable spots */}
-      <ClickableSpot position={[0, 0.1, 2]} onClick={() => handleSpotClick([0, 1.5, 2])} />
-      <ClickableSpot position={[0, 0.1, -2]} onClick={() => handleSpotClick([0, 1.5, -2])} />
-
-      <OrbitControls />
     </Canvas>
   );
 }
