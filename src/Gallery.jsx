@@ -261,7 +261,7 @@ export default function GalleryApp() {
     <Canvas camera={{ position: cameraStartPosition, fov: 75, rotation: [0, Math.PI, 0] }}>
       <CameraController />
       <ambientLight intensity={0.3} />
-      <pointLight position={[0, 5, 0]} intensity={0.8} /
+      <pointLight position={[0, 5, 0]} intensity={0.8} />
 
       <axesHelper args={[5]} />
       <gridHelper args={[100, 100]} />
