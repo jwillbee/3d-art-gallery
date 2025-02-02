@@ -36,7 +36,7 @@ function Wall({ position, rotation, hasOpening = false }) {
 
     return (
       <mesh position={position} rotation={rotation}>
-        <bufferGeometry attach="geometry" {...geometry} />
+        <BufferGeometry attach="geometry" {...geometry} />
         <meshStandardMaterial color="white" />
       </mesh>
     );
@@ -258,10 +258,13 @@ export default function GalleryApp() {
   const cameraStartPosition = [0, 2, 50];
 
   return (
-    <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
+    <Canvas camera={{ position: cameraStartPosition, fov: 75, rotation: [0, Math.PI, 0] }}>
       <CameraController />
       <ambientLight intensity={0.3} />
-      <pointLight position={[0, 5, 0]} intensity={0.8} />
+      <pointLight position={[0, 5, 0]} intensity={0.8} /
+
+      <axesHelper args={[5]} />
+      <gridHelper args={[100, 100]} />
 
       <group position={[0, 0, 0]}>
         <mesh position={[0, 0, 0]}>
