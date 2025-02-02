@@ -8,13 +8,13 @@ import * as THREE from 'three';
 function ArtFrame({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[1.5, 1.5, 0.1]} />
+      <boxGeometry args={[1.5, 1, 0.1]} />
       <meshStandardMaterial color="white" />
     </mesh>
   );
 }
 
-// Information Sign component
+// InfoSign component placed directly in front of the start point
 function InfoSign({ position }) {
   return (
     <mesh position={position}>
@@ -24,7 +24,7 @@ function InfoSign({ position }) {
   );
 }
 
-// Wall component
+// Wall component with optional centered opening
 function Wall({ position, rotation, hasOpening = false }) {
   if (hasOpening) {
     return (
@@ -67,7 +67,7 @@ function Room({ position, openings = {} }) {
     <group position={position}>
       {/* Floor */}
       <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[10, 0.1, 10]} />
+        <boxGeometry args={[10, 0.1, 30]} />
         <meshStandardMaterial color="lightgray" />
       </mesh>
 
@@ -86,48 +86,46 @@ function Room({ position, openings = {} }) {
       />
       {/* Back Wall */}
       <Wall
-        position={[0, 2.5, -5]}
+        position={[0, 2.5, -15]}
         rotation={[0, 0, 0]}
         hasOpening={openings.back}
       />
       {/* Front Wall */}
       <Wall
-        position={[0, 2.5, 5]}
+        position={[0, 2.5, 15]}
         rotation={[0, Math.PI, 0]}
         hasOpening={openings.front}
       />
 
       {/* Ceiling */}
-      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 10]} />
+      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 30]} />
 
-      {/* Art Frames attached to visible walls */}
-      {/* Left Wall Art Frames */}
+      {/* Art Frames attached to walls */}
       {!openings.left && (
         <>
-          <ArtFrame position={[-4.9, 2.5, -3]} rotation={[0, Math.PI / 2, 0]} />
+          <ArtFrame position={[-4.9, 2.5, -10]} rotation={[0, Math.PI / 2, 0]} />
           <ArtFrame position={[-4.9, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
-          <ArtFrame position={[-4.9, 2.5, 3]} rotation={[0, Math.PI / 2, 0]} />
+          <ArtFrame position={[-4.9, 2.5, 10]} rotation={[0, Math.PI / 2, 0]} />
         </>
       )}
-      {/* Back Wall Art Frames */}
-      {!openings.back && (
-        <>
-          <ArtFrame position={[0, 2.5, -4.9]} rotation={[0, 0, 0]} />
-        </>
-      )}
-      {/* Right Wall Art Frames */}
       {!openings.right && (
         <>
-          <ArtFrame position={[4.9, 2.5, -3]} rotation={[0, -Math.PI / 2, 0]} />
+          <ArtFrame position={[4.9, 2.5, -10]} rotation={[0, -Math.PI / 2, 0]} />
           <ArtFrame position={[4.9, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
-          <ArtFrame position={[4.9, 2.5, 3]} rotation={[0, -Math.PI / 2, 0]} />
+          <ArtFrame position={[4.9, 2.5, 10]} rotation={[0, -Math.PI / 2, 0]} />
         </>
+      )}
+      {!openings.back && (
+        <ArtFrame position={[0, 2.5, -14.9]} rotation={[0, 0, 0]} />
+      )}
+      {!openings.front && (
+        <ArtFrame position={[0, 2.5, 14.9]} rotation={[0, Math.PI, 0]} />
       )}
     </group>
   );
 }
 
-// Camera Controller Component with Collision Detection
+// Camera Controller with Collision Detection
 function CameraController() {
   const { camera } = useThree();
   const touchData = useRef({ startX: 0, startY: 0, isTwoFinger: false });
@@ -136,19 +134,20 @@ function CameraController() {
 
   // Define the walkable boundaries
   const boundaries = [
-    { xMin: -5, xMax: 5, zMin: -25, zMax: 25 }, // Main Hall
+    // Main Hall
+    { xMin: -5, xMax: 5, zMin: -50, zMax: 50 },
     // Left Rooms
-    { xMin: -15, xMax: -5, zMin: -15, zMax: -5 }, // Left Room 1
-    { xMin: -15, xMax: -5, zMin: 5, zMax: 15 },   // Left Room 2
+    { xMin: -15, xMax: -5, zMin: -45, zMax: -15 }, // Left Room 1
+    { xMin: -15, xMax: -5, zMin: 15, zMax: 45 },   // Left Room 2
     // Right Rooms
-    { xMin: 5, xMax: 15, zMin: -15, zMax: -5 },   // Right Room 1
-    { xMin: 5, xMax: 15, zMin: 5, zMax: 15 },     // Right Room 2
+    { xMin: 5, xMax: 15, zMin: -45, zMax: -15 },   // Right Room 1
+    { xMin: 5, xMax: 15, zMin: 15, zMax: 45 },     // Right Room 2
   ];
 
   // Initialize spring values
   const [{ position, rotationY }, api] = useSpring(() => ({
     position: camera.position.toArray(),
-    rotationY: camera.rotation.y,
+    rotationY: camera.rotation.y + Math.PI,
     config: { mass: 1, tension: 280, friction: 60 },
   }));
 
@@ -278,7 +277,7 @@ function CameraController() {
 
 // Main Gallery component
 export default function GalleryApp() {
-  const cameraStartPosition = [0, 2, 25]; // Start at one end of the hallway
+  const cameraStartPosition = [0, 2, 50]; // Start at one end of the hallway
   const cameraStartRotation = [0, Math.PI, 0]; // Facing down the hallway along negative Z-axis
 
   return (
@@ -294,49 +293,58 @@ export default function GalleryApp() {
       <group position={[0, 0, 0]}>
         {/* Floor */}
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[10, 0.1, 50]} />
+          <boxGeometry args={[10, 0.1, 100]} />
           <meshStandardMaterial color="lightgray" />
         </mesh>
 
-        {/* Left Wall */}
-        <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
-        {/* Right Wall */}
-        <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
+        {/* Left Wall with openings to side rooms */}
+        <group>
+          {[-30, 0].map((zPos) => (
+            <React.Fragment key={`left-wall-${zPos}`}>
+              {/* Wall segment above opening */}
+              <mesh position={[-5, 2.5, zPos + 15]}>
+                <boxGeometry args={[0.1, 5, 30]} />
+                <meshStandardMaterial color="white" />
+              </mesh>
+              {/* Opening */}
+              <Wall
+                position={[-5, 2.5, zPos + 15]}
+                rotation={[0, -Math.PI / 2, 0]}
+                hasOpening
+              />
+            </React.Fragment>
+          ))}
+        </group>
+
+        {/* Right Wall with openings to side rooms */}
+        <group>
+          {[-30, 0].map((zPos) => (
+            <React.Fragment key={`right-wall-${zPos}`}>
+              {/* Wall segment above opening */}
+              <mesh position={[5, 2.5, zPos + 15]}>
+                <boxGeometry args={[0.1, 5, 30]} />
+                <meshStandardMaterial color="white" />
+              </mesh>
+              {/* Opening */}
+              <Wall
+                position={[5, 2.5, zPos + 15]}
+                rotation={[0, Math.PI / 2, 0]}
+                hasOpening
+              />
+            </React.Fragment>
+          ))}
+        </group>
+
         {/* Back Wall */}
-        <Wall position={[0, 2.5, 25]} rotation={[0, Math.PI, 0]} />
+        <Wall position={[0, 2.5, 50]} rotation={[0, Math.PI, 0]} />
         {/* Front Wall */}
-        <Wall position={[0, 2.5, -25]} />
-
-        {/* Openings to side rooms */}
-        {/* Left Rooms Openings */}
-        <Wall
-          position={[-5, 2.5, 15]}
-          rotation={[0, -Math.PI / 2, 0]}
-          hasOpening
-        />
-        <Wall
-          position={[-5, 2.5, -15]}
-          rotation={[0, -Math.PI / 2, 0]}
-          hasOpening
-        />
-
-        {/* Right Rooms Openings */}
-        <Wall
-          position={[5, 2.5, 15]}
-          rotation={[0, Math.PI / 2, 0]}
-          hasOpening
-        />
-        <Wall
-          position={[5, 2.5, -15]}
-          rotation={[0, Math.PI / 2, 0]}
-          hasOpening
-        />
+        <Wall position={[0, 2.5, -50]} />
 
         {/* Ceiling */}
-        <Ceiling position={[0, 5, 0]} size={[10, 0.1, 50]} />
+        <Ceiling position={[0, 5, 0]} size={[10, 0.1, 100]} />
 
-        {/* Art Frames attached to visible walls */}
-        {[-20, -10, 0, 10, 20].map((zPos) => (
+        {/* Art Frames attached to walls only */}
+        {[-40, -20, 0, 20, 40].map((zPos) => (
           <ArtFrame
             key={`left-frame-${zPos}`}
             position={[-4.9, 2.5, zPos]}
@@ -345,10 +353,10 @@ export default function GalleryApp() {
         ))}
 
         {/* Info Sign directly in front of the start point */}
-        <InfoSign position={[0, 2.5, 24.9]} rotation={[0, Math.PI, 0]} />
+        <InfoSign position={[0, 2.5, 49.9]} rotation={[0, Math.PI, 0]} />
 
-        {/* Placeholder for other gallery items */}
-        <mesh position={[0, 0.6, 22]}>
+        {/* Placeholder for other gallery decorations */}
+        <mesh position={[0, 0.6, 47]}>
           <boxGeometry args={[1, 1.2, 1]} />
           <meshStandardMaterial color="gray" />
         </mesh>
@@ -358,24 +366,24 @@ export default function GalleryApp() {
       {/* Left Room 1 */}
       <Room
         position={[-10, 0, 15]}
-        openings={{ right: true }}
+        openings={{ right: true, front: true, back: false }}
       />
       {/* Left Room 2 */}
       <Room
         position={[-10, 0, -15]}
-        openings={{ right: true }}
+        openings={{ right: true, front: false, back: true }}
       />
 
       {/* Right Rooms */}
       {/* Right Room 1 */}
       <Room
         position={[10, 0, 15]}
-        openings={{ left: true }}
+        openings={{ left: true, front: true, back: false }}
       />
       {/* Right Room 2 */}
       <Room
         position={[10, 0, -15]}
-        openings={{ left: true }}
+        openings={{ left: true, front: false, back: true }}
       />
     </Canvas>
   );
