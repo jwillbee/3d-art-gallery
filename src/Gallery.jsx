@@ -36,7 +36,7 @@ function Wall({ position, rotation, hasOpening = false }) {
 
     return (
       <mesh position={position} rotation={rotation}>
-        <BufferGeometry attach="geometry" {...geometry} />
+        <primitive object={geometry} />
         <meshStandardMaterial color="white" />
       </mesh>
     );
@@ -141,15 +141,15 @@ function CameraController() {
     { xMin: 5, xMax: 15, zMin: 15, zMax: 45 },     // Right Room 2
   ];
 
-  const [{ position, rotationY }, api] = useSpring(() => ({
+  const [spring, api] = useSpring(() => ({
     position: camera.position.toArray(),
     rotationY: camera.rotation.y + Math.PI,
     config: { mass: 1, tension: 280, friction: 60 },
   }));
 
   useFrame(() => {
-    camera.position.lerp(new Vector3(...position.get()), 0.1);
-    camera.rotation.set(0, rotationY.get(), 0);
+    camera.position.lerp(new Vector3(...spring.position.get()), 0.1);
+    camera.rotation.set(0, spring.rotationY.get(), 0);
   });
 
   useEffect(() => {
@@ -249,7 +249,7 @@ function CameraController() {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [api, boundaries, camera]);
+  }, [api, boundaries, camera, spring.position, spring.rotationY]);
 
   return null;
 }
