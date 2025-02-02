@@ -141,15 +141,16 @@ function CameraController() {
     { xMin: 5, xMax: 15, zMin: 15, zMax: 45 },     // Right Room 2
   ];
 
-  const [spring, api] = useSpring(() => ({
-    position: camera.position.toArray(),
-    rotationY: camera.rotation.y + Math.PI,
-    config: { mass: 1, tension: 280, friction: 60 },
-  }));
+  const [{ position, rotationY }, api] = useSpring(() => ({
+  position: camera.position.toArray(),
+  rotationY: camera.rotation.y + Math.PI,
+  config: { mass: 1, tension: 280, friction: 60 },
+}));
 
   useFrame(() => {
-    camera.position.lerp(new Vector3(...spring.position.get()), 0.1);
-    camera.rotation.set(0, spring.rotationY.get(), 0);
+    camera.position.lerp(new Vector3(...position.get()), 0.1);
+    camera.rotation.set(0, rotationY.get(), 0);
+
   });
 
   useEffect(() => {
