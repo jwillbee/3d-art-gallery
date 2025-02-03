@@ -5,58 +5,20 @@ import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 
 // Wall component with optional centered vertical opening
-function Wall({ position, rotation, hasOpening = false }) {
-  if (!hasOpening) {
-    return (
-      <mesh position={position} rotation={rotation}>
-        <boxGeometry args={[10, 5, 0.1]} />
-        <meshStandardMaterial color="white" />
-      </mesh>
-    );
-  } else {
-    const wallShape = new Shape();
-    wallShape.moveTo(-5, 0);
-    wallShape.lineTo(-5, 5);
-    wallShape.lineTo(5, 5);
-    wallShape.lineTo(5, 0);
-    wallShape.lineTo(-5, 0);
-
-    const openingWidth = 4;
-    const openingHeight = 3;
-    const openingShape = new Shape();
-    openingShape.moveTo(-openingWidth / 2, 1);
-    openingShape.lineTo(-openingWidth / 2, 1 + openingHeight);
-    openingShape.lineTo(openingWidth / 2, 1 + openingHeight);
-    openingShape.lineTo(openingWidth / 2, 1);
-    openingShape.lineTo(-openingWidth / 2, 1);
-
-    wallShape.holes.push(openingShape);
-
-    const geometry = new THREE.ShapeGeometry(wallShape);
-
-    return (
-      <mesh position={position} rotation={rotation}>
-        <primitive object={geometry} />
-        <meshStandardMaterial color="white" />
-      </mesh>
-    );
-  }
+function Wall({ position, rotation }) {
+  return (
+    <mesh position={position} rotation={rotation}>
+      <boxGeometry args={[10, 5, 0.1]} />
+      <meshStandardMaterial color="white" />
+    </mesh>
+  );
 }
+
 // ArtFrame component for displaying the art
 function ArtFrame({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={[1.5, 1, 0.1]} />
-      <meshStandardMaterial color="gray" />
-    </mesh>
-  );
-}
-
-// InfoSign component placed directly in front of the start point
-function InfoSign({ position }) {
-  return (
-    <mesh position={position}>
-      <boxGeometry args={[4, 2, 0.1]} />
       <meshStandardMaterial color="gray" />
     </mesh>
   );
@@ -71,58 +33,17 @@ function Ceiling({ position, size }) {
     </mesh>
   );
 }
-// Room component
-function Room({ position, openings = {} }) {
+
+// Floor component
+function Floor({ position, size }) {
   return (
-    <group position={position}>
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[10, 0.1, 30]} />
-        <meshStandardMaterial color="lightgray" />
-      </mesh>
-      <Wall
-        position={[-5, 2.5, 0]}
-        rotation={[0, Math.PI / 2, 0]}
-        hasOpening={openings.left}
-      />
-      <Wall
-        position={[5, 2.5, 0]}
-        rotation={[0, -Math.PI / 2, 0]}
-        hasOpening={openings.right}
-      />
-      <Wall
-        position={[0, 2.5, -15]}
-        rotation={[0, 0, 0]}
-        hasOpening={openings.back}
-      />
-      <Wall
-        position={[0, 2.5, 15]}
-        rotation={[0, Math.PI, 0]}
-        hasOpening={openings.front}
-      />
-      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 30]} />
-      {!openings.front && (
-        <ArtFrame position={[0, 2, 14.9]} rotation={[0, Math.PI, 0]} />
-      )}
-      {!openings.back && (
-        <ArtFrame position={[0, 2, -14.9]} rotation={[0, 0, 0]} />
-      )}
-      {!openings.left && (
-        <>
-          <ArtFrame position={[-4.9, 2, -10]} rotation={[0, Math.PI / 2, 0]} />
-          <ArtFrame position={[-4.9, 2, 0]} rotation={[0, Math.PI / 2, 0]} />
-          <ArtFrame position={[-4.9, 2, 10]} rotation={[0, Math.PI / 2, 0]} />
-        </>
-      )}
-      {!openings.right && (
-        <>
-          <ArtFrame position={[4.9, 2, -10]} rotation={[0, -Math.PI / 2, 0]} />
-          <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
-          <ArtFrame position={[4.9, 2, 10]} rotation={[0, -Math.PI / 2, 0]} />
-        </>
-      )}
-    </group>
+    <mesh position={position}>
+      <boxGeometry args={size} />
+      <meshStandardMaterial color="lightgray" />
+    </mesh>
   );
 }
+
 // Camera Controller with Collision Detection
 function CameraController() {
   const { camera } = useThree();
@@ -131,26 +52,18 @@ function CameraController() {
   const threshold = 20;
 
   const boundaries = [
-    // Main Hall
-    { xMin: -5, xMax: 5, zMin: -50, zMax: 50 },
-    // Left Rooms
-    { xMin: -15, xMax: -5, zMin: -45, zMax: -15 }, // Left Room 1
-    { xMin: -15, xMax: -5, zMin: 15, zMax: 45 },   // Left Room 2
-    // Right Rooms
-    { xMin: 5, xMax: 15, zMin: -45, zMax: -15 },   // Right Room 1
-    { xMin: 5, xMax: 15, zMin: 15, zMax: 45 },     // Right Room 2
+    { xMin: -5, xMax: 5, zMin: 0, zMax: 100 },
   ];
 
   const [{ position, rotationY }, api] = useSpring(() => ({
-  position: camera.position.toArray(),
-  rotationY: camera.rotation.y + Math.PI,
-  config: { mass: 1, tension: 280, friction: 60 },
-}));
+    position: camera.position.toArray(),
+    rotationY: camera.rotation.y + Math.PI,
+    config: { mass: 1, tension: 280, friction: 60 },
+  }));
 
   useFrame(() => {
     camera.position.lerp(new Vector3(...position.get()), 0.1);
     camera.rotation.set(0, rotationY.get(), 0);
-
   });
 
   useEffect(() => {
@@ -243,83 +156,52 @@ function CameraController() {
 
     window.addEventListener('touchstart', handleTouchStart, { passive: false });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [api, boundaries, camera, spring.position, spring.rotationY]);
+  }, [api, boundaries, camera, position, rotationY]);
 
   return null;
 }
+
 // Main Gallery component
 export default function GalleryApp() {
-  const cameraStartPosition = [0, 2, 50];
+  const cameraStartPosition = [0, 2, 90];
 
   return (
-    <Canvas camera={{ position: cameraStartPosition, fov: 75, rotation: [0, Math.PI, 0] }}>
+    <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
       <CameraController />
       <ambientLight intensity={0.3} />
       <pointLight position={[0, 5, 0]} intensity={0.8} />
-
       <axesHelper args={[5]} />
       <gridHelper args={[100, 100]} />
 
       <group position={[0, 0, 0]}>
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[10, 0.1, 100]} />
-          <meshStandardMaterial color="lightgray" />
-        </mesh>
-        <Wall
-          position={[-5, 2.5, 20]}
-          rotation={[0, Math.PI / 2, 0]}
-          hasOpening={true}
-        />
-        <Wall
-          position={[-5, 2.5, -20]}
-          rotation={[0, Math.PI / 2, 0]}
-          hasOpening={true}
-        />
-        <Wall
-          position={[-5, 2.5, 0]}
-          rotation={[0, Math.PI / 2, 0]}
-        />
-        <Wall
-          position={[5, 2.5, 20]}
-          rotation={[0, -Math.PI / 2, 0]}
-          hasOpening={true}
-        />
-        <Wall
-          position={[5, 2.5, -20]}
-          rotation={[0, -Math.PI / 2, 0]}
-          hasOpening={true}
-        />
-        <Wall
-          position={[5, 2.5, 0]}
-          rotation={[0, -Math.PI / 2, 0]}
-        />
-        <Wall position={[0, 2.5, 50]} rotation={[0, Math.PI, 0]} />
-        <Wall position={[0, 2.5, -50]} />
-        <Ceiling position={[0, 5, 0]} size={[10, 0.1, 100]} />
-        {[-40, -20, 0, 20, 40].map((zPos) => (
+        <Floor position={[0, 0, 50]} size={[10, 0.1, 100]} />
+        <Ceiling position={[0, 5, 50]} size={[10, 0.1, 100]} />
+        <Wall position={[0, 2.5, 100]} />
+        <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} />
+        <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} />
+        <Wall position={[5, 2.5, 50]} rotation={[0, -Math.PI / 2, 0]} />
+        {[10, 30, 50, 70, 90].map((zPos) => (
           <ArtFrame
             key={`left-frame-${zPos}`}
             position={[-4.9, 2, zPos]}
             rotation={[0, Math.PI / 2, 0]}
           />
         ))}
-        <InfoSign position={[0, 2.5, 49.9]} rotation={[0, Math.PI, 0]} />
-        <mesh position={[0, 0.6, 47]}>
-          <boxGeometry args={[1, 1.2, 1]} />
-          <meshStandardMaterial color="gray" />
-        </mesh>
+        {[10, 30, 50, 70, 90].map((zPos) => (
+          <ArtFrame
+            key={`right-frame-${zPos}`}
+            position={[4.9, 2, zPos]}
+            rotation={[0, -Math.PI / 2, 0]}
+          />
+        ))}
       </group>
-      <Room position={[-10, 0, 20]} openings={{ right: true }} />
-      <Room position={[-10, 0, -20]} openings={{ right: true }} />
-      <Room position={[10, 0, 20]} openings={{ left: true }} />
-      <Room position={[10, 0, -20]} openings={{ left: true }} />
     </Canvas>
   );
 }
