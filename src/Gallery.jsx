@@ -15,6 +15,40 @@ function Wall({ position, rotation, size }) {
   );
 }
 
+// WallWithOpenings component to create a wall with multiple doorways
+function WallWithOpenings({ position, rotation, size, openings }) {
+  const [width, height, depth] = size;
+
+  // Create the wall shape
+  const wallShape = new THREE.Shape();
+  wallShape.moveTo(-width / 2, -height / 2);
+  wallShape.lineTo(-width / 2, height / 2);
+  wallShape.lineTo(width / 2, height / 2);
+  wallShape.lineTo(width / 2, -height / 2);
+  wallShape.lineTo(-width / 2, -height / 2);
+
+  // Create openings in the wall
+  openings.forEach((opening) => {
+    const { x, y, openingWidth, openingHeight } = opening;
+    const hole = new THREE.Path();
+    hole.moveTo(x - openingWidth / 2, y - openingHeight / 2);
+    hole.lineTo(x - openingWidth / 2, y + openingHeight / 2);
+    hole.lineTo(x + openingWidth / 2, y + openingHeight / 2);
+    hole.lineTo(x + openingWidth / 2, y - openingHeight / 2);
+    hole.lineTo(x - openingWidth / 2, y - openingHeight / 2);
+    wallShape.holes.push(hole);
+  });
+
+  const geometry = new THREE.ShapeGeometry(wallShape);
+
+  return (
+    <mesh position={position} rotation={rotation}>
+      <primitive object={geometry} />
+      <meshStandardMaterial color="white" />
+    </mesh>
+  );
+}
+
 // ArtFrame component
 function ArtFrame({ position, rotation }) {
   return (
@@ -55,8 +89,10 @@ function CameraController() {
   const boundaries = [
     // Main Hall
     { xMin: -5, xMax: 5, zMin: 0, zMax: 75 },
-    // Side Room on the Right
+    // Side Room 1
     { xMin: 5, xMax: 15, zMin: 30, zMax: 45 },
+    // Side Room 2
+    { xMin: 5, xMax: 15, zMin: 47.5, zMax: 62.5 },
   ];
 
   const [{ position, rotationY }, api] = useSpring(() => ({
@@ -200,19 +236,17 @@ export default function GalleryApp() {
         <Wall position={[0, 2.5, 75]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
         {/* Left Wall */}
         <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
-        {/* Right Wall */}
-        {/* Divided into two segments to create an opening for the side room */}
-        {/* First Segment (from z = 0 to z = 30) */}
-        <Wall
-          position={[5, 2.5, 15]}
+        {/* Right Wall with Openings for Side Rooms */}
+        <WallWithOpenings
+          position={[5, 2.5, 37.5]}
           rotation={[0, -Math.PI / 2, 0]}
-          size={[30, 5, 0.1]}
-        />
-        {/* Second Segment (from z = 45 to z = 75) */}
-        <Wall
-          position={[5, 2.5, 60]}
-          rotation={[0, -Math.PI / 2, 0]}
-          size={[30, 5, 0.1]}
+          size={[75, 5, 0.1]}
+          openings={[
+            // Opening for Side Room 1 (z = 30 to z = 45)
+            { x: 30 - 37.5, y: 0, openingWidth: 0.1, openingHeight: 3 },
+            // Opening for Side Room 2 (z = 47.5 to z = 62.5)
+            { x: 55 - 37.5, y: 0, openingWidth: 0.1, openingHeight: 3 },
+          ]}
         />
         {/* ArtFrames */}
         {/* Left Wall */}
@@ -233,8 +267,32 @@ export default function GalleryApp() {
         ))}
       </group>
 
-      {/* Side Room on the Right */}
+      {/* Side Room 1 on the Right */}
       <group position={[10, 0, 37.5]}>
+        {/* Floor */}
+        <Floor position={[0, 0, -7.5]} size={[10, 0.1, 15]} />
+        {/* Ceiling */}
+        <Ceiling position={[0, 5, -7.5]} size={[10, 0.1, 15]} />
+        {/* Walls */}
+        {/* Back Wall */}
+        <Wall position={[0, 2.5, -15]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
+        {/* Front Wall */}
+        <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+        {/* Right Wall */}
+        <Wall position={[5, 2.5, -7.5]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
+        {/* ArtFrames */}
+        {/* Back Wall */}
+        <ArtFrame position={[0, 2, -14.9]} rotation={[0, 0, 0]} />
+        {/* Front Wall */}
+        <ArtFrame position={[0, 2, -0.1]} rotation={[0, Math.PI, 0]} />
+        {/* Right Wall */}
+        <ArtFrame position={[4.9, 2, -12.5]} rotation={[0, -Math.PI / 2, 0]} />
+        <ArtFrame position={[4.9, 2, -7.5]} rotation={[0, -Math.PI / 2, 0]} />
+        <ArtFrame position={[4.9, 2, -2.5]} rotation={[0, -Math.PI / 2, 0]} />
+      </group>
+
+      {/* Side Room 2 on the Right */}
+      <group position={[10, 0, 55]}>
         {/* Floor */}
         <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
         {/* Ceiling */}
@@ -246,7 +304,6 @@ export default function GalleryApp() {
         <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
         {/* Right Wall */}
         <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
-        {/* No Left Wall (open to the main hall) */}
         {/* ArtFrames */}
         {/* Back Wall */}
         <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
