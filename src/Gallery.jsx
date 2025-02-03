@@ -2,13 +2,12 @@ import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
-import * as THREE from 'three';
 
 // Wall component
-function Wall({ position, rotation }) {
+function Wall({ position, rotation, width = 10, height = 5 }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[10, 5, 0.1]} />
+      <boxGeometry args={[width, height, 0.1]} />
       <meshStandardMaterial color="white" />
     </mesh>
   );
@@ -45,7 +44,7 @@ function Floor({ position, size }) {
 }
 
 // Room component
-function Room({ position, hasDoor = false }) {
+function Room({ position }) {
   return (
     <group position={position}>
       {/* Floor */}
@@ -55,41 +54,25 @@ function Room({ position, hasDoor = false }) {
       <Ceiling position={[0, 5, 0]} size={[10, 0.1, 20]} />
 
       {/* Walls */}
+      {/* Back Wall */}
       <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} />
+      {/* Front Wall */}
       <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} />
+      {/* Right Wall */}
+      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
+      {/* Exterior Left Wall */}
       <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
-      {/* If the room has a door, we create an opening on the right wall */}
-      {hasDoor ? (
-        <mesh position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]}>
-          <boxGeometry args={[10, 5, 0.1]} />
-          <meshStandardMaterial color="white" />
-          {/* Door Opening */}
-          <mesh position={[0, -2.5, 0]}>
-            <boxGeometry args={[4, 3, 0.2]} />
-            <meshStandardMaterial color="white" transparent opacity={0} />
-          </mesh>
-        </mesh>
-      ) : (
-        <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
-      )}
 
       {/* Art Frames */}
       {/* Back Wall */}
       <ArtFrame position={[0, 2, -9.9]} rotation={[0, 0, 0]} />
-      {/* Left Wall */}
-      <ArtFrame position={[-4.9, 2, -5]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[-4.9, 2, 0]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[-4.9, 2, 5]} rotation={[0, Math.PI / 2, 0]} />
-      {/* Right Wall (if no door) */}
-      {!hasDoor && (
-        <>
-          <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
-          <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
-          <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
-        </>
-      )}
+      {/* Right Wall */}
+      <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
+      <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
+      <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       {/* Front Wall */}
       <ArtFrame position={[0, 2, 9.9]} rotation={[0, Math.PI, 0]} />
+      {/* No art frames on the open side (connected to the main hall) */}
     </group>
   );
 }
@@ -243,20 +226,17 @@ export default function GalleryApp() {
         <Ceiling position={[0, 5, 50]} size={[10, 0.1, 100]} />
 
         {/* Walls */}
+        {/* Back Wall */}
         <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} />
+        {/* Front Wall */}
         <Wall position={[0, 2.5, 100]} rotation={[0, 0, 0]} />
+        {/* Left Wall */}
         <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} />
         {/* Right Wall with Openings for Rooms */}
         {/* Upper Part */}
-        <mesh position={[5, 2.5, 75]} rotation={[0, -Math.PI / 2, 0]}>
-          <boxGeometry args={[50, 5, 0.1]} />
-          <meshStandardMaterial color="white" />
-        </mesh>
+        <Wall position={[5, 2.5, 85]} rotation={[0, -Math.PI / 2, 0]} width={30} />
         {/* Lower Part */}
-        <mesh position={[5, 2.5, 25]} rotation={[0, -Math.PI / 2, 0]}>
-          <boxGeometry args={[50, 5, 0.1]} />
-          <meshStandardMaterial color="white" />
-        </mesh>
+        <Wall position={[5, 2.5, 15]} rotation={[0, -Math.PI / 2, 0]} width={30} />
 
         {/* Art Frames on Walls */}
         {/* Left Wall */}
@@ -268,7 +248,7 @@ export default function GalleryApp() {
           />
         ))}
         {/* Right Wall */}
-        {[10, 30, 50, 70, 90].map((zPos) => (
+        {[10, 30, 70, 90].map((zPos) => (
           <ArtFrame
             key={`right-frame-${zPos}`}
             position={[4.9, 2, zPos]}
@@ -278,9 +258,8 @@ export default function GalleryApp() {
       </group>
 
       {/* Rooms on the Right Side */}
-      <Room position={[10, 0, 40]} hasDoor={true} />
-      <Room position={[10, 0, 70]} hasDoor={true} />
-
+      <Room position={[10, 0, 40]} />
+      <Room position={[10, 0, 70]} />
     </Canvas>
   );
 }
