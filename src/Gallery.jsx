@@ -60,7 +60,7 @@ function Room({ position }) {
       <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} />
       {/* Right Wall */}
       <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
-      {/* Exterior Left Wall */}
+      {/* Left Wall (Entrance from Main Hall) */}
       <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
 
       {/* Art Frames */}
@@ -72,7 +72,6 @@ function Room({ position }) {
       <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       {/* Front Wall */}
       <ArtFrame position={[0, 2, 9.9]} rotation={[0, Math.PI, 0]} />
-      {/* No art frames on the open side (connected to the main hall) */}
     </group>
   );
 }
@@ -233,10 +232,19 @@ export default function GalleryApp() {
         {/* Left Wall */}
         <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} />
         {/* Right Wall with Openings for Rooms */}
-        {/* Upper Part */}
-        <Wall position={[5, 2.5, 85]} rotation={[0, -Math.PI / 2, 0]} width={30} />
-        {/* Lower Part */}
+        {/* Upper Part (before first room) */}
         <Wall position={[5, 2.5, 15]} rotation={[0, -Math.PI / 2, 0]} width={30} />
+        {/* Between rooms */}
+        <Wall position={[5, 2.5, 55]} rotation={[0, -Math.PI / 2, 0]} width={10} />
+        {/* After second room */}
+        <Wall position={[5, 2.5, 85]} rotation={[0, -Math.PI / 2, 0]} width={30} />
+        {/* Side Walls at Room Entrances */}
+        {/* Room 1 Entrance Walls */}
+        <Wall position={[5, 2.5, 30]} rotation={[0, 0, 0]} width={10} />
+        <Wall position={[5, 2.5, 50]} rotation={[0, 0, 0]} width={10} />
+        {/* Room 2 Entrance Walls */}
+        <Wall position={[5, 2.5, 60]} rotation={[0, 0, 0]} width={10} />
+        <Wall position={[5, 2.5, 80]} rotation={[0, 0, 0]} width={10} />
 
         {/* Art Frames on Walls */}
         {/* Left Wall */}
@@ -248,7 +256,7 @@ export default function GalleryApp() {
           />
         ))}
         {/* Right Wall */}
-        {[10, 30, 70, 90].map((zPos) => (
+        {[10, 90].map((zPos) => (
           <ArtFrame
             key={`right-frame-${zPos}`}
             position={[4.9, 2, zPos]}
