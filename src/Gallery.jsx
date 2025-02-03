@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Vector3, Shape } from 'three';
+import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 
-// Wall component with optional centered vertical opening
+// Wall component
 function Wall({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
@@ -14,7 +14,7 @@ function Wall({ position, rotation }) {
   );
 }
 
-// ArtFrame component for displaying the art
+// ArtFrame component
 function ArtFrame({ position, rotation }) {
   return (
     <mesh position={position} rotation={rotation}>
@@ -44,6 +44,56 @@ function Floor({ position, size }) {
   );
 }
 
+// Room component
+function Room({ position, hasDoor = false }) {
+  return (
+    <group position={position}>
+      {/* Floor */}
+      <Floor position={[0, 0, 0]} size={[10, 0.1, 20]} />
+
+      {/* Ceiling */}
+      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 20]} />
+
+      {/* Walls */}
+      <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} />
+      <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} />
+      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+      {/* If the room has a door, we create an opening on the right wall */}
+      {hasDoor ? (
+        <mesh position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]}>
+          <boxGeometry args={[10, 5, 0.1]} />
+          <meshStandardMaterial color="white" />
+          {/* Door Opening */}
+          <mesh position={[0, -2.5, 0]}>
+            <boxGeometry args={[4, 3, 0.2]} />
+            <meshStandardMaterial color="white" transparent opacity={0} />
+          </mesh>
+        </mesh>
+      ) : (
+        <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
+      )}
+
+      {/* Art Frames */}
+      {/* Back Wall */}
+      <ArtFrame position={[0, 2, -9.9]} rotation={[0, 0, 0]} />
+      {/* Left Wall */}
+      <ArtFrame position={[-4.9, 2, -5]} rotation={[0, Math.PI / 2, 0]} />
+      <ArtFrame position={[-4.9, 2, 0]} rotation={[0, Math.PI / 2, 0]} />
+      <ArtFrame position={[-4.9, 2, 5]} rotation={[0, Math.PI / 2, 0]} />
+      {/* Right Wall (if no door) */}
+      {!hasDoor && (
+        <>
+          <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
+          <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
+          <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
+        </>
+      )}
+      {/* Front Wall */}
+      <ArtFrame position={[0, 2, 9.9]} rotation={[0, Math.PI, 0]} />
+    </group>
+  );
+}
+
 // Camera Controller with Collision Detection
 function CameraController() {
   const { camera } = useThree();
@@ -52,12 +102,16 @@ function CameraController() {
   const threshold = 20;
 
   const boundaries = [
+    // Main Hall
     { xMin: -5, xMax: 5, zMin: 0, zMax: 100 },
+    // Rooms on the Right Side
+    { xMin: 5, xMax: 15, zMin: 30, zMax: 50 }, // Room 1
+    { xMin: 5, xMax: 15, zMin: 60, zMax: 80 }, // Room 2
   ];
 
   const [{ position, rotationY }, api] = useSpring(() => ({
     position: camera.position.toArray(),
-    rotationY: camera.rotation.y + Math.PI,
+    rotationY: camera.rotation.y,
     config: { mass: 1, tension: 280, friction: 60 },
   }));
 
@@ -85,6 +139,7 @@ function CameraController() {
       const currentY = e.touches[0].clientY;
 
       if (touchData.current.isTwoFinger && e.touches.length === 2) {
+        // Rotation
         const deltaX =
           (currentX + e.touches[1].clientX) / 2 -
           (touchData.current.startX + touchData.current.startX2) / 2;
@@ -96,6 +151,7 @@ function CameraController() {
         touchData.current.startX = e.touches[0].clientX;
         touchData.current.startX2 = e.touches[1].clientX;
       } else if (!touchData.current.isTwoFinger) {
+        // Movement
         const deltaX = currentX - touchData.current.startX;
         const deltaY = currentY - touchData.current.startY;
 
@@ -175,18 +231,35 @@ export default function GalleryApp() {
   return (
     <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
       <CameraController />
-      <ambientLight intensity={0.3} />
-      <pointLight position={[0, 5, 0]} intensity={0.8} />
-      <axesHelper args={[5]} />
-      <gridHelper args={[100, 100]} />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, 5, 50]} intensity={1} />
 
+      {/* Main Hall */}
       <group position={[0, 0, 0]}>
+        {/* Floor */}
         <Floor position={[0, 0, 50]} size={[10, 0.1, 100]} />
+
+        {/* Ceiling */}
         <Ceiling position={[0, 5, 50]} size={[10, 0.1, 100]} />
-        <Wall position={[0, 2.5, 100]} />
+
+        {/* Walls */}
         <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} />
+        <Wall position={[0, 2.5, 100]} rotation={[0, 0, 0]} />
         <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} />
-        <Wall position={[5, 2.5, 50]} rotation={[0, -Math.PI / 2, 0]} />
+        {/* Right Wall with Openings for Rooms */}
+        {/* Upper Part */}
+        <mesh position={[5, 2.5, 75]} rotation={[0, -Math.PI / 2, 0]}>
+          <boxGeometry args={[50, 5, 0.1]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+        {/* Lower Part */}
+        <mesh position={[5, 2.5, 25]} rotation={[0, -Math.PI / 2, 0]}>
+          <boxGeometry args={[50, 5, 0.1]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
+
+        {/* Art Frames on Walls */}
+        {/* Left Wall */}
         {[10, 30, 50, 70, 90].map((zPos) => (
           <ArtFrame
             key={`left-frame-${zPos}`}
@@ -194,6 +267,7 @@ export default function GalleryApp() {
             rotation={[0, Math.PI / 2, 0]}
           />
         ))}
+        {/* Right Wall */}
         {[10, 30, 50, 70, 90].map((zPos) => (
           <ArtFrame
             key={`right-frame-${zPos}`}
@@ -202,6 +276,11 @@ export default function GalleryApp() {
           />
         ))}
       </group>
+
+      {/* Rooms on the Right Side */}
+      <Room position={[10, 0, 40]} hasDoor={true} />
+      <Room position={[10, 0, 70]} hasDoor={true} />
+
     </Canvas>
   );
 }
