@@ -4,10 +4,40 @@ import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 
 // Wall component
-function Wall({ position, rotation, width = 10, height = 5 }) {
+function Wall({ position, rotation, width = 10, height = 5, length = 100 }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[width, height, 0.1]} />
+      <boxGeometry args={[length, height, 0.1]} />
+      <meshStandardMaterial color="white" />
+    </mesh>
+  );
+}
+
+// Wall with openings (for doorways)
+function WallWithOpenings({ position, rotation, openings = [], wallLength = 100, wallHeight = 5 }) {
+  const wallShape = new THREE.Shape();
+  wallShape.moveTo(0, 0);
+  wallShape.lineTo(0, wallHeight);
+  wallShape.lineTo(wallLength, wallHeight);
+  wallShape.lineTo(wallLength, 0);
+  wallShape.lineTo(0, 0);
+
+  openings.forEach((opening) => {
+    const { start, width, height, bottom } = opening;
+    const hole = new THREE.Path();
+    hole.moveTo(start, bottom);
+    hole.lineTo(start, bottom + height);
+    hole.lineTo(start + width, bottom + height);
+    hole.lineTo(start + width, bottom);
+    hole.lineTo(start, bottom);
+    wallShape.holes.push(hole);
+  });
+
+  const geometry = new THREE.ShapeGeometry(wallShape);
+
+  return (
+    <mesh position={position} rotation={rotation}>
+      <primitive object={geometry} />
       <meshStandardMaterial color="white" />
     </mesh>
   );
@@ -55,13 +85,13 @@ function Room({ position }) {
 
       {/* Walls */}
       {/* Back Wall */}
-      <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} />
+      <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} length={10} />
       {/* Front Wall */}
-      <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} />
+      <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} length={10} />
       {/* Right Wall */}
-      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} />
-      {/* Left Wall (Entrance from Main Hall) */}
-      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} length={20} />
+      {/* Left Wall */}
+      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} length={20} />
 
       {/* Art Frames */}
       {/* Back Wall */}
@@ -226,25 +256,21 @@ export default function GalleryApp() {
 
         {/* Walls */}
         {/* Back Wall */}
-        <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} />
+        <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} length={10} />
         {/* Front Wall */}
-        <Wall position={[0, 2.5, 100]} rotation={[0, 0, 0]} />
-        {/* Left Wall */}
-        <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} />
-        {/* Right Wall with Openings for Rooms */}
-        {/* Upper Part (before first room) */}
-        <Wall position={[5, 2.5, 15]} rotation={[0, -Math.PI / 2, 0]} width={30} />
-        {/* Between rooms */}
-        <Wall position={[5, 2.5, 55]} rotation={[0, -Math.PI / 2, 0]} width={10} />
-        {/* After second room */}
-        <Wall position={[5, 2.5, 85]} rotation={[0, -Math.PI / 2, 0]} width={30} />
-        {/* Side Walls at Room Entrances */}
-        {/* Room 1 Entrance Walls */}
-        <Wall position={[5, 2.5, 30]} rotation={[0, 0, 0]} width={10} />
-        <Wall position={[5, 2.5, 50]} rotation={[0, 0, 0]} width={10} />
-        {/* Room 2 Entrance Walls */}
-        <Wall position={[5, 2.5, 60]} rotation={[0, 0, 0]} width={10} />
-        <Wall position={[5, 2.5, 80]} rotation={[0, 0, 0]} width={10} />
+        <Wall position={[0, 2.5, 100]} rotation={[0, 0, 0]} length={10} />
+        {/* Left Wall - Continuous */}
+        <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} length={100} />
+        {/* Right Wall with Doorways */}
+        <WallWithOpenings
+          position={[5, 2.5, 50]}
+          rotation={[0, -Math.PI / 2, 0]}
+          wallLength={100}
+          openings={[
+            { start: 30, width: 0.1, height: 3, bottom: 0 }, // Doorway to Room 1
+            { start: 60, width: 0.1, height: 3, bottom: 0 }, // Doorway to Room 2
+          ]}
+        />
 
         {/* Art Frames on Walls */}
         {/* Left Wall */}
