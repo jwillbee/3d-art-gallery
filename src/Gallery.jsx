@@ -1,20 +1,23 @@
+// Ensure all necessary imports are included
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
+import * as THREE from 'three'; // Import THREE for Shape and Geometry
 
 // Wall component
-function Wall({ position, rotation, width = 10, height = 5, length = 100 }) {
+function Wall({ position, rotation, width = 10, height = 5 }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[length, height, 0.1]} />
+      <boxGeometry args={[width, height, 0.1]} />
       <meshStandardMaterial color="white" />
     </mesh>
   );
 }
 
-// Wall with openings (for doorways)
-function WallWithOpenings({ position, rotation, openings = [], wallLength = 100, wallHeight = 5 }) {
+// WallWithOpenings component adjusted to extend along the z-axis
+function WallWithOpenings({ position, openings = [], wallLength = 100, wallHeight = 5 }) {
+  // Create the wall shape along the z-axis
   const wallShape = new THREE.Shape();
   wallShape.moveTo(0, 0);
   wallShape.lineTo(0, wallHeight);
@@ -22,21 +25,23 @@ function WallWithOpenings({ position, rotation, openings = [], wallLength = 100,
   wallShape.lineTo(wallLength, 0);
   wallShape.lineTo(0, 0);
 
+  // Create holes (openings) in the wall
   openings.forEach((opening) => {
-    const { start, width, height, bottom } = opening;
+    const { start, width, height } = opening;
     const hole = new THREE.Path();
-    hole.moveTo(start, bottom);
-    hole.lineTo(start, bottom + height);
-    hole.lineTo(start + width, bottom + height);
-    hole.lineTo(start + width, bottom);
-    hole.lineTo(start, bottom);
+    hole.moveTo(start, 0);
+    hole.lineTo(start, height);
+    hole.lineTo(start + width, height);
+    hole.lineTo(start + width, 0);
+    hole.lineTo(start, 0);
     wallShape.holes.push(hole);
   });
 
   const geometry = new THREE.ShapeGeometry(wallShape);
+  geometry.rotateY(Math.PI / 2); // Rotate to align along the z-axis
 
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh position={position}>
       <primitive object={geometry} />
       <meshStandardMaterial color="white" />
     </mesh>
@@ -85,13 +90,13 @@ function Room({ position }) {
 
       {/* Walls */}
       {/* Back Wall */}
-      <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} length={10} />
+      <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} width={10} />
       {/* Front Wall */}
-      <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} length={10} />
+      <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} width={10} />
       {/* Right Wall */}
-      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} length={20} />
+      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} width={20} />
       {/* Left Wall */}
-      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} length={20} />
+      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} width={20} />
 
       {/* Art Frames */}
       {/* Back Wall */}
@@ -256,19 +261,19 @@ export default function GalleryApp() {
 
         {/* Walls */}
         {/* Back Wall */}
-        <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} length={10} />
+        <Wall position={[0, 2.5, 0]} rotation={[0, Math.PI, 0]} width={10} />
         {/* Front Wall */}
-        <Wall position={[0, 2.5, 100]} rotation={[0, 0, 0]} length={10} />
+        <Wall position={[0, 2.5, 100]} rotation={[0, 0, 0]} width={10} />
         {/* Left Wall - Continuous */}
-        <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} length={100} />
+        <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} width={100} />
         {/* Right Wall with Doorways */}
         <WallWithOpenings
-          position={[5, 2.5, 50]}
-          rotation={[0, -Math.PI / 2, 0]}
+          position={[5, 0, 0]}
           wallLength={100}
+          wallHeight={5}
           openings={[
-            { start: 30, width: 0.1, height: 3, bottom: 0 }, // Doorway to Room 1
-            { start: 60, width: 0.1, height: 3, bottom: 0 }, // Doorway to Room 2
+            { start: 30, width: 0.1, height: 3 }, // Doorway to Room 1
+            { start: 60, width: 0.1, height: 3 }, // Doorway to Room 2
           ]}
         />
 
