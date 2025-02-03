@@ -1,4 +1,4 @@
-// Import necessary libraries
+// Ensure all necessary imports are included
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
@@ -10,38 +10,6 @@ function Wall({ position, rotation, size }) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={size} />
-      <meshStandardMaterial color="white" />
-    </mesh>
-  );
-}
-
-// WallWithDoorway component
-function WallWithDoorway({ position, rotation, size, doorwayPosition }) {
-  const wallShape = new THREE.Shape();
-  const [width, height, depth] = size;
-
-  wallShape.moveTo(-width / 2, -height / 2);
-  wallShape.lineTo(-width / 2, height / 2);
-  wallShape.lineTo(width / 2, height / 2);
-  wallShape.lineTo(width / 2, -height / 2);
-  wallShape.lineTo(-width / 2, -height / 2);
-
-  // Create doorway hole
-  const doorWidth = 2;
-  const doorHeight = 3;
-  const doorShape = new THREE.Path();
-  doorShape.moveTo(doorwayPosition - doorWidth / 2, -height / 2);
-  doorShape.lineTo(doorwayPosition - doorWidth / 2, -height / 2 + doorHeight);
-  doorShape.lineTo(doorwayPosition + doorWidth / 2, -height / 2 + doorHeight);
-  doorShape.lineTo(doorwayPosition + doorWidth / 2, -height / 2);
-  doorShape.lineTo(doorwayPosition - doorWidth / 2, -height / 2);
-  wallShape.holes.push(doorShape);
-
-  const geometry = new THREE.ShapeGeometry(wallShape);
-
-  return (
-    <mesh position={position} rotation={rotation}>
-      <primitive object={geometry} />
       <meshStandardMaterial color="white" />
     </mesh>
   );
@@ -77,41 +45,7 @@ function Floor({ position, size }) {
   );
 }
 
-// Room component
-function Room({ position }) {
-  return (
-    <group position={position}>
-      {/* Floor */}
-      <Floor position={[0, 0, 0]} size={[10, 0.1, 20]} />
-      {/* Ceiling */}
-      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 20]} />
-      {/* Walls */}
-      {/* Back Wall */}
-      <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
-      {/* Front Wall */}
-      <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
-      {/* Left Wall */}
-      <Wall position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} size={[20, 5, 0.1]} />
-      {/* Right Wall */}
-      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[20, 5, 0.1]} />
-      {/* ArtFrames */}
-      {/* Back Wall */}
-      <ArtFrame position={[0, 2, -9.9]} rotation={[0, 0, 0]} />
-      {/* Front Wall */}
-      <ArtFrame position={[0, 2, 9.9]} rotation={[0, Math.PI, 0]} />
-      {/* Left Wall */}
-      <ArtFrame position={[-4.9, 2, -5]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[-4.9, 2, 0]} rotation={[0, Math.PI / 2, 0]} />
-      <ArtFrame position={[-4.9, 2, 5]} rotation={[0, Math.PI / 2, 0]} />
-      {/* Right Wall */}
-      <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
-      <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
-      <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
-    </group>
-  );
-}
-
-// Camera Controller with Collision Detection
+// Camera Controller with Collision Detection (unchanged)
 function CameraController() {
   const { camera } = useThree();
   const touchData = useRef({ startX: 0, startY: 0, isTwoFinger: false });
@@ -120,10 +54,9 @@ function CameraController() {
 
   const boundaries = [
     // Main Hall
-    { xMin: -5, xMax: 5, zMin: 0, zMax: 100 },
-    // Rooms on the Right Side
-    { xMin: 5, xMax: 15, zMin: 20, zMax: 40 }, // Room 1
-    { xMin: 5, xMax: 15, zMin: 60, zMax: 80 }, // Room 2
+    { xMin: -5, xMax: 5, zMin: 0, zMax: 75 },
+    // Side Room on the Right
+    { xMin: 5, xMax: 15, zMin: 30, zMax: 45 },
   ];
 
   const [{ position, rotationY }, api] = useSpring(() => ({
@@ -244,45 +177,46 @@ function CameraController() {
   return null;
 }
 
-// Main Gallery component
+// Main Gallery component with adjustments
 export default function GalleryApp() {
-  const cameraStartPosition = [0, 2, 90];
+  const cameraStartPosition = [0, 2, 70];
 
   return (
     <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
       <CameraController />
       <ambientLight intensity={0.5} />
-      <pointLight position={[0, 5, 50]} intensity={1} />
+      <pointLight position={[0, 5, 37.5]} intensity={1} />
 
       {/* Main Hall */}
       <group position={[0, 0, 0]}>
         {/* Floor */}
-        <Floor position={[0, 0, 50]} size={[10, 0.1, 100]} />
+        <Floor position={[0, 0, 37.5]} size={[10, 0.1, 75]} />
         {/* Ceiling */}
-        <Ceiling position={[0, 5, 50]} size={[10, 0.1, 100]} />
+        <Ceiling position={[0, 5, 37.5]} size={[10, 0.1, 75]} />
         {/* Walls */}
         {/* Back Wall */}
         <Wall position={[0, 2.5, 0]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
         {/* Front Wall */}
-        <Wall position={[0, 2.5, 100]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
-        {/* Left Wall - continuous wall */}
-        <Wall position={[-5, 2.5, 50]} rotation={[0, Math.PI / 2, 0]} size={[100, 5, 0.1]} />
-        {/* Right Wall with Doorways */}
-        <WallWithDoorway
-          position={[5, 2.5, 50]}
+        <Wall position={[0, 2.5, 75]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+        {/* Left Wall */}
+        <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
+        {/* Right Wall */}
+        {/* Divided into two segments to create an opening for the side room */}
+        {/* First Segment (from z = 0 to z = 30) */}
+        <Wall
+          position={[5, 2.5, 15]}
           rotation={[0, -Math.PI / 2, 0]}
-          size={[100, 5, 0.1]}
-          doorwayPosition={-30}
+          size={[30, 5, 0.1]}
         />
-        <WallWithDoorway
-          position={[5, 2.5, 50]}
+        {/* Second Segment (from z = 45 to z = 75) */}
+        <Wall
+          position={[5, 2.5, 60]}
           rotation={[0, -Math.PI / 2, 0]}
-          size={[100, 5, 0.1]}
-          doorwayPosition={-60}
+          size={[30, 5, 0.1]}
         />
         {/* ArtFrames */}
         {/* Left Wall */}
-        {[10, 30, 50, 70, 90].map((zPos) => (
+        {[10, 25, 40, 55, 70].map((zPos) => (
           <ArtFrame
             key={`left-frame-${zPos}`}
             position={[-4.9, 2, zPos]}
@@ -290,7 +224,7 @@ export default function GalleryApp() {
           />
         ))}
         {/* Right Wall */}
-        {[10, 90].map((zPos) => (
+        {[10, 65].map((zPos) => (
           <ArtFrame
             key={`right-frame-${zPos}`}
             position={[4.9, 2, zPos]}
@@ -299,9 +233,30 @@ export default function GalleryApp() {
         ))}
       </group>
 
-      {/* Rooms on the Right Side */}
-      <Room position={[10, 0, 30]} />
-      <Room position={[10, 0, 70]} />
+      {/* Side Room on the Right */}
+      <group position={[10, 0, 37.5]}>
+        {/* Floor */}
+        <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
+        {/* Ceiling */}
+        <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
+        {/* Walls */}
+        {/* Back Wall */}
+        <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
+        {/* Front Wall */}
+        <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+        {/* Right Wall */}
+        <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
+        {/* No Left Wall (open to the main hall) */}
+        {/* ArtFrames */}
+        {/* Back Wall */}
+        <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
+        {/* Front Wall */}
+        <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
+        {/* Right Wall */}
+        <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
+        <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
+        <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
+      </group>
     </Canvas>
   );
 }
