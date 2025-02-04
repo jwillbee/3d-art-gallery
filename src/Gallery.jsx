@@ -57,7 +57,7 @@ function CameraController() {
   // Main Hall
   { xMin: -5, xMax: 5, zMin: 0, zMax: 75 },
   // New Side Room on the Right
-  { xMin: 5, xMax: 15, zMin: 20, zMax: 30 },
+  { xMin: 5, xMax: 15, zMin: 20, zMax: 35 }, // Adjusted zMax to 35 to cover the side room
   // Existing Side Room on the Right
   { xMin: 5, xMax: 15, zMin: 45, zMax: 60 },
 ];
@@ -270,51 +270,35 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
 
-  {/* New Side Room on the Right */}
+ {/* New Side Room on the Right */}
 <group position={[10, 0, 25]}>
   {/* Floor */}
-  <Floor position={[0, 0, 0]} size={[10, 0.1, 10]} />
+  <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
   {/* Ceiling */}
-  <Ceiling position={[0, 5, 0]} size={[10, 0.1, 10]} />
+  <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
   {/* Walls */}
   {/* Back Wall */}
-  <Wall
-    position={[0, 2.5, -5]}
-    rotation={[0, 0, 0]}
-    size={[10, 5, 0.1]}
-  />
+  <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
   {/* Front Wall */}
-  <Wall
-    position={[0, 2.5, 5]}
-    rotation={[0, Math.PI, 0]}
-    size={[10, 5, 0.1]}
-  />
+  <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
   {/* Right Wall */}
-  <Wall
-    position={[5, 2.5, 0]}
-    rotation={[0, -Math.PI / 2, 0]}
-    size={[10, 5, 0.1]}
-  />
+  <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
   {/* No Left Wall (opens to the main hall) */}
   {/* ArtFrames */}
   {/* Back Wall */}
-  <ArtFrame
-    position={[0, 2, -4.9]}
-    rotation={[0, 0, 0]}
-  />
+  <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
   {/* Front Wall */}
-  <ArtFrame
-    position={[0, 2, 4.9]}
-    rotation={[0, Math.PI, 0]}
-  />
+  <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
   {/* Right Wall */}
-  {[ -2, 0, 2 ].map((zPos) => (
+  {[-5, 0, 5].map((zPos) => (
     <ArtFrame
       key={`new-right-frame-${zPos}`}
       position={[4.9, 2, zPos]}
       rotation={[0, -Math.PI / 2, 0]}
     />
   ))}
+</group>
+
 </group>
     </Canvas>
   );
