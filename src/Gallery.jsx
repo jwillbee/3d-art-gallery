@@ -226,12 +226,12 @@ export default function GalleryApp() {
   {/* ArtFrames */}
   {/* Left Wall */}
   {[10, 25, 40, 55, 70].map((zPos) => (
-    <ArtFrame
-      key={left-frame-${zPos}}
-      position={[-4.9, 2, zPos]}
-      rotation={[0, Math.PI / 2, 0]}
-    />
-  ))}
+  <ArtFrame
+    key={`left-frame-${zPos}`}
+    position={[-4.9, 2, zPos]}
+    rotation={[0, Math.PI / 2, 0]}
+  />
+))}
   {/* Right Wall */}
   {[10, 65].map((zPos) => (
     <ArtFrame
