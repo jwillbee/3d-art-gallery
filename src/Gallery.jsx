@@ -270,8 +270,8 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
 
-{/* New Side Room on the Right */}
-<group position={[10, 0, 25]}>
+      {/*New Side Room on the Right*/}
+<group position={[10, 0, 10]}>
   {/* Floor */}
   <mesh position={[0, 0, 0]}>
     <boxGeometry args={[10, 0.1, 15]} />
@@ -299,7 +299,6 @@ export default function GalleryApp() {
     <meshStandardMaterial color="green" />
   </mesh>
 </group>
-
     </Canvas>
   );
 }
