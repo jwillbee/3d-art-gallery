@@ -1,3 +1,4 @@
+
 // Ensure all necessary imports are included
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -204,17 +205,17 @@ export default function GalleryApp() {
   <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
   {/* Right Wall */}
   {/* Divided into three segments to create two openings for the side rooms */}
-  {/* First Segment (from z = 0 to z = 7.5) */}
+  {/* First Segment (from z = 0 to z = 10) */}
   <Wall
-    position={[5, 2.5, 3.75]}
+    position={[5, 2.5, 5]}
     rotation={[0, -Math.PI / 2, 0]}
-    size={[7.5, 5, 0.1]}
+    size={[10, 5, 0.1]}
   />
-  {/* Second Segment (from z = 12.5 to z = 30) */}
+  {/* Second Segment (from z = 10 to z = 30) */}
   <Wall
-    position={[5, 2.5, 21.25]}
+    position={[5, 2.5, 20]}
     rotation={[0, -Math.PI / 2, 0]}
-    size={[17.5, 5, 0.1]}
+    size={[20, 5, 0.1]}
   />
   {/* Third Segment (from z = 45 to z = 75) */}
   <Wall
@@ -226,7 +227,7 @@ export default function GalleryApp() {
   {/* Left Wall */}
   {[10, 25, 40, 55, 70].map((zPos) => (
     <ArtFrame
-      key={`left-frame-${zPos}`}
+      key={left-frame-${zPos}}
       position={[-4.9, 2, zPos]}
       rotation={[0, Math.PI / 2, 0]}
     />
@@ -234,7 +235,7 @@ export default function GalleryApp() {
   {/* Right Wall */}
   {[10, 65].map((zPos) => (
     <ArtFrame
-      key={`right-frame-${zPos}`}
+      key={right-frame-${zPos}}
       position={[4.9, 2, zPos]}
       rotation={[0, -Math.PI / 2, 0]}
     />
