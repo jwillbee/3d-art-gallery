@@ -245,60 +245,48 @@ export default function GalleryApp() {
 
 
 
-      {/* Side Room on the Right */}
-      <group position={[10, 0, 37.5]}>
-        {/* Floor */}
-        <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
-        {/* Ceiling */}
-        <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
-        {/* Walls */}
-        {/* Back Wall */}
-        <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
-        {/* Front Wall */}
-        <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
-        {/* Right Wall */}
-        <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
-        {/* No Left Wall (open to the main hall) */}
-        {/* ArtFrames */}
-        {/* Back Wall */}
-        <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
-        {/* Front Wall */}
-        <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
-        {/* Right Wall */}
-        <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
-        <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
-        <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
-      </group>
-
-      {/*New Side Room on the Right*/}
-<group position={[10, 0, 10]}>
+      {/* Side Room on the Right (existing)*/}
+<group position={[10, 0, 37.5]}>
   {/* Floor */}
-  <mesh position={[0, 0, 0]}>
-    <boxGeometry args={[10, 0.1, 15]} />
-    <meshStandardMaterial color="blue" />
-  </mesh>
+  <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
   {/* Ceiling */}
-  <mesh position={[0, 5, 0]}>
-    <boxGeometry args={[10, 0.1, 15]} />
-    <meshStandardMaterial color="yellow" />
-  </mesh>
+  <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
   {/* Walls */}
   {/* Back Wall */}
-  <mesh position={[0, 2.5, -7.5]}>
-    <boxGeometry args={[10, 5, 0.1]} />
-    <meshStandardMaterial color="red" />
-  </mesh>
+  <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
   {/* Front Wall */}
-  <mesh position={[0, 2.5, 7.5]}>
-    <boxGeometry args={[10, 5, 0.1]} />
-    <meshStandardMaterial color="white" />
-  </mesh>
+  <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
   {/* Right Wall */}
-  <mesh position={[5, 2.5, 0]}>
-    <boxGeometry args={[15, 5, 0.1]} />
-    <meshStandardMaterial color="green" />
-  </mesh>
+  <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
+  {/* No Left Wall (open to the main hall) */}
+  {/* ArtFrames */}
+  {/* Back Wall */}
+  <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
+  {/* Front Wall */}
+  <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
+  {/* Right Wall */}
+  <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
+  <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
+  <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
 </group>
+
+
+      {/* New Side Room on the Right*/}
+<group position={[10, 0, 10]}>
+  {/* Floor */}
+  <Floor position={[0, 0, 0]} size={[10, 0.1, 20]} />
+  {/* Ceiling */}
+  <Ceiling position={[0, 5, 0]} size={[10, 0.1, 20]} />
+  {/* Walls */}
+  {/* Back Wall */}
+  <Wall position={[0, 2.5, -10]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
+  {/* Front Wall */}
+  <Wall position={[0, 2.5, 10]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+  {/* Right Wall */}
+  <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[20, 5, 0.1]} />
+  {/* No Left Wall (open to the main hall) */}
+</group>
+
     </Canvas>
   );
 }
