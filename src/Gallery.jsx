@@ -55,8 +55,10 @@ function CameraController() {
   const boundaries = [
     // Main Hall
     { xMin: -5, xMax: 5, zMin: 0, zMax: 75 },
-    // Side Room on the Right
+    // Far Room on the Right
     { xMin: 5, xMax: 15, zMin: 30, zMax: 45 },
+    // Near Room on the Right
+    { xMin: 5, xMax: 15, zMin: 5, zMax: 20 },
   ];
 
   const [{ position, rotationY }, api] = useSpring(() => ({
