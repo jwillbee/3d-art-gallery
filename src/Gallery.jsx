@@ -270,34 +270,50 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
 
-{/* New Side Room on the Right */}
+{/* Simplified New Side Room on the Right */}
 <group position={[10, 0, 25]}>
   {/* Floor */}
-  <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
+  <mesh position={[0, 0, 0]}>
+    <boxGeometry args={[10, 0.1, 15]} />
+    <meshStandardMaterial color="blue" />
+  </mesh>
   {/* Ceiling */}
-  <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
-  {/* Walls */}
+  <mesh position={[0, 5, 0]}>
+    <boxGeometry args={[10, 0.1, 15]} />
+    <meshStandardMaterial color="yellow" />
+  </mesh>
   {/* Back Wall */}
-  <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
+  <mesh position={[0, 2.5, -7.5]}>
+    <boxGeometry args={[10, 5, 0.1]} />
+    <meshStandardMaterial color="red" />
+  </mesh>
   {/* Front Wall */}
-  <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+  <mesh position={[0, 2.5, 7.5]}>
+    <boxGeometry args={[10, 5, 0.1]} />
+    <meshStandardMaterial color="white" />
+  </mesh>
   {/* Right Wall */}
-  <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
-  {/* No Left Wall (opens to the main hall) */}
+  <mesh position={[5, 2.5, 0]}>
+    <boxGeometry args={[15, 5, 0.1]} />
+    <meshStandardMaterial color="green" />
+  </mesh>
   {/* ArtFrames */}
-  {/* Back Wall */}
-  <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
-  {/* Front Wall */}
-  <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
-  {/* Right Wall */}
+  <mesh position={[0, 2, -7.4]}>
+    <boxGeometry args={[1.5, 1, 0.1]} />
+    <meshStandardMaterial color="gray" />
+  </mesh>
+  <mesh position={[0, 2, 7.4]}>
+    <boxGeometry args={[1.5, 1, 0.1]} />
+    <meshStandardMaterial color="gray" />
+  </mesh>
   {[-5, 0, 5].map((zPos) => (
-    <ArtFrame
-      key={`new-right-frame-${zPos}`}
-      position={[4.9, 2, zPos]}
-      rotation={[0, -Math.PI / 2, 0]}
-    />
+    <mesh key={`new-right-frame-${zPos}`} position={[4.9, 2, zPos]}>
+      <boxGeometry args={[1.5, 1, 0.1]} />
+      <meshStandardMaterial color="gray" />
+    </mesh>
   ))}
 </group>
+
 
     </Canvas>
   );
