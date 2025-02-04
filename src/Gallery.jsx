@@ -201,37 +201,44 @@ export default function GalleryApp() {
         {/* Left Wall */}
         <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
         {/* Right Wall */}
-        {/* Divided into two segments to create an opening for the side room */}
-        {/* First Segment (from z = 0 to z = 30) */}
+        {/* Divided into three segments to create two openings for the side rooms */}
+        {/* First Segment (from z = 0 to z = 10) */}
         <Wall
-          position={[5, 2.5, 15]}
+          position={[5, 2.5, 5]}
           rotation={[0, -Math.PI / 2, 0]}
-          size={[30, 5, 0.1]}
-        />
-        {/* Second Segment (from z = 45 to z = 75) */}
+          size={[10, 5, 0.1]}
+          />
+        {/* Second Segment (from z = 10 to z = 30) */}
+        <Wall
+          position={[5, 2.5, 20]}
+          rotation={[0, -Math.PI / 2, 0]}
+          size={[20, 5, 0.1]}
+          />
+        {/* Third Segment (from z = 45 to z = 75) */}
         <Wall
           position={[5, 2.5, 60]}
           rotation={[0, -Math.PI / 2, 0]}
           size={[30, 5, 0.1]}
-        />
+          />
         {/* ArtFrames */}
         {/* Left Wall */}
         {[10, 25, 40, 55, 70].map((zPos) => (
-          <ArtFrame
-            key={`left-frame-${zPos}`}
-            position={[-4.9, 2, zPos]}
-            rotation={[0, Math.PI / 2, 0]}
-          />
-        ))}
-        {/* Right Wall */}
-        {[10, 65].map((zPos) => (
-          <ArtFrame
-            key={`right-frame-${zPos}`}
-            position={[4.9, 2, zPos]}
-            rotation={[0, -Math.PI / 2, 0]}
-          />
-        ))}
-      </group>
+      <ArtFrame
+        key={`left-frame-${zPos}`}
+        position={[-4.9, 2, zPos]}
+        rotation={[0, Math.PI / 2, 0]}
+        />
+    ))}
+  {/* Right Wall */}
+  {[10, 65].map((zPos) => (
+    <ArtFrame
+      key={`right-frame-${zPos}`}
+      position={[4.9, 2, zPos]}
+      rotation={[0, -Math.PI / 2, 0]}
+    />
+  ))}
+</group>
+
 
       {/* Side Room on the Right */}
       <group position={[10, 0, 37.5]}>
@@ -257,6 +264,31 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
+
+      {/* New Side Room closer to the start point */}
+    <group position={[10, 0, 10]}>
+      {/* Floor */}
+      <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
+      {/* Ceiling */}
+      <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
+      {/* Walls */}
+      {/* Back Wall */}
+      <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
+      {/* Front Wall */}
+      <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+      {/* Right Wall */}
+      <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
+      {/* No Left Wall (open to the main hall) */}
+      {/* ArtFrames */}
+      {/* Back Wall */}
+      <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
+      {/* Front Wall */}
+      <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
+      {/* Right Wall */}
+      <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
+      <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
+      <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
+    </group>    
     </Canvas>
   );
 }
