@@ -270,7 +270,7 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
 
- {/* New Side Room on the Right */}
+{/* New Side Room on the Right */}
 <group position={[10, 0, 25]}>
   {/* Floor */}
   <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
@@ -298,6 +298,7 @@ export default function GalleryApp() {
     />
   ))}
 </group>
+
     </Canvas>
   );
 }
