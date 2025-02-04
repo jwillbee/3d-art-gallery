@@ -298,8 +298,6 @@ export default function GalleryApp() {
     />
   ))}
 </group>
-
-</group>
     </Canvas>
   );
 }
