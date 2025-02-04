@@ -232,14 +232,14 @@ export default function GalleryApp() {
     rotation={[0, Math.PI / 2, 0]}
   />
 ))}
-  {/* Right Wall */}
   {[10, 65].map((zPos) => (
-    <ArtFrame
-      key={right-frame-${zPos}}
-      position={[4.9, 2, zPos]}
-      rotation={[0, -Math.PI / 2, 0]}
-    />
-  ))}
+  <ArtFrame
+    key={`right-frame-${zPos}`}
+    position={[4.9, 2, zPos]}
+    rotation={[0, -Math.PI / 2, 0]}
+  />
+))}
+
 </group>
 
 
