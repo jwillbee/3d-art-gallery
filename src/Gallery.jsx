@@ -270,7 +270,7 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
 
-{/* Simplified New Side Room on the Right */}
+{/* New Side Room on the Right */}
 <group position={[10, 0, 25]}>
   {/* Floor */}
   <mesh position={[0, 0, 0]}>
@@ -282,6 +282,7 @@ export default function GalleryApp() {
     <boxGeometry args={[10, 0.1, 15]} />
     <meshStandardMaterial color="yellow" />
   </mesh>
+  {/* Walls */}
   {/* Back Wall */}
   <mesh position={[0, 2.5, -7.5]}>
     <boxGeometry args={[10, 5, 0.1]} />
@@ -297,23 +298,7 @@ export default function GalleryApp() {
     <boxGeometry args={[15, 5, 0.1]} />
     <meshStandardMaterial color="green" />
   </mesh>
-  {/* ArtFrames */}
-  <mesh position={[0, 2, -7.4]}>
-    <boxGeometry args={[1.5, 1, 0.1]} />
-    <meshStandardMaterial color="gray" />
-  </mesh>
-  <mesh position={[0, 2, 7.4]}>
-    <boxGeometry args={[1.5, 1, 0.1]} />
-    <meshStandardMaterial color="gray" />
-  </mesh>
-  {[-5, 0, 5].map((zPos) => (
-    <mesh key={`new-right-frame-${zPos}`} position={[4.9, 2, zPos]}>
-      <boxGeometry args={[1.5, 1, 0.1]} />
-      <meshStandardMaterial color="gray" />
-    </mesh>
-  ))}
 </group>
-
 
     </Canvas>
   );
