@@ -189,48 +189,48 @@ export default function GalleryApp() {
       <ambientLight intensity={0.5} />
       <pointLight position={[0, 5, 37.5]} intensity={1} />
 
-      {/* Main Hall */}
-      <group position={[0, 0, 0]}>
-        {/* Floor */}
-        <Floor position={[0, 0, 37.5]} size={[10, 0.1, 75]} />
-        {/* Ceiling */}
-        <Ceiling position={[0, 5, 37.5]} size={[10, 0.1, 75]} />
-        {/* Walls */}
-        {/* Back Wall */}
-        <Wall position={[0, 2.5, 0]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
-        {/* Front Wall */}
-        <Wall position={[0, 2.5, 75]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
-        {/* Left Wall */}
-        <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
-        {/* Right Wall */}
-        {/* Divided into three segments to create two openings for the side rooms */}
-        {/* First Segment (from z = 0 to z = 10) */}
-        <Wall
-          position={[5, 2.5, 5]}
-          rotation={[0, -Math.PI / 2, 0]}
-          size={[10, 5, 0.1]}
-          />
-        {/* Second Segment (from z = 10 to z = 30) */}
-        <Wall
-          position={[5, 2.5, 20]}
-          rotation={[0, -Math.PI / 2, 0]}
-          size={[20, 5, 0.1]}
-          />
-        {/* Third Segment (from z = 45 to z = 75) */}
-        <Wall
-          position={[5, 2.5, 60]}
-          rotation={[0, -Math.PI / 2, 0]}
-          size={[30, 5, 0.1]}
-          />
-        {/* ArtFrames */}
-        {/* Left Wall */}
-        {[10, 25, 40, 55, 70].map((zPos) => (
-      <ArtFrame
-        key={`left-frame-${zPos}`}
-        position={[-4.9, 2, zPos]}
-        rotation={[0, Math.PI / 2, 0]}
-        />
-    ))}
+     {/* Main Hall */}
+<group position={[0, 0, 0]}>
+  {/* Floor */}
+  <Floor position={[0, 0, 37.5]} size={[10, 0.1, 75]} />
+  {/* Ceiling */}
+  <Ceiling position={[0, 5, 37.5]} size={[10, 0.1, 75]} />
+  {/* Walls */}
+  {/* Back Wall */}
+  <Wall position={[0, 2.5, 0]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
+  {/* Front Wall */}
+  <Wall position={[0, 2.5, 75]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
+  {/* Left Wall */}
+  <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
+  {/* Right Wall */}
+  {/* Divided into three segments to create two openings for the side rooms */}
+  {/* First Segment (from z = 0 to z = 10) */}
+  <Wall
+    position={[5, 2.5, 5]}
+    rotation={[0, -Math.PI / 2, 0]}
+    size={[10, 5, 0.1]}
+  />
+  {/* Second Segment (from z = 10 to z = 30) */}
+  <Wall
+    position={[5, 2.5, 20]}
+    rotation={[0, -Math.PI / 2, 0]}
+    size={[20, 5, 0.1]}
+  />
+  {/* Third Segment (from z = 45 to z = 75) */}
+  <Wall
+    position={[5, 2.5, 60]}
+    rotation={[0, -Math.PI / 2, 0]}
+    size={[30, 5, 0.1]}
+  />
+  {/* ArtFrames */}
+  {/* Left Wall */}
+  {[10, 25, 40, 55, 70].map((zPos) => (
+    <ArtFrame
+      key={`left-frame-${zPos}`}
+      position={[-4.9, 2, zPos]}
+      rotation={[0, Math.PI / 2, 0]}
+    />
+  ))}
   {/* Right Wall */}
   {[10, 65].map((zPos) => (
     <ArtFrame
@@ -240,6 +240,7 @@ export default function GalleryApp() {
     />
   ))}
 </group>
+
 
 
       {/* Side Room on the Right */}
