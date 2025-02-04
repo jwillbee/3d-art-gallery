@@ -204,17 +204,17 @@ export default function GalleryApp() {
   <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
   {/* Right Wall */}
   {/* Divided into three segments to create two openings for the side rooms */}
-  {/* First Segment (from z = 0 to z = 10) */}
+  {/* First Segment (from z = 0 to z = 7.5) */}
   <Wall
-    position={[5, 2.5, 5]}
+    position={[5, 2.5, 3.75]}
     rotation={[0, -Math.PI / 2, 0]}
-    size={[10, 5, 0.1]}
+    size={[7.5, 5, 0.1]}
   />
-  {/* Second Segment (from z = 10 to z = 30) */}
+  {/* Second Segment (from z = 12.5 to z = 30) */}
   <Wall
-    position={[5, 2.5, 20]}
+    position={[5, 2.5, 21.25]}
     rotation={[0, -Math.PI / 2, 0]}
-    size={[20, 5, 0.1]}
+    size={[17.5, 5, 0.1]}
   />
   {/* Third Segment (from z = 45 to z = 75) */}
   <Wall
