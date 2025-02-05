@@ -9,17 +9,17 @@ import { TextureLoader } from 'three';
 const textureLoader = new TextureLoader();
 const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg', (texture) => {
   floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(5, 15);
+  floorTexture.repeat.set(5, 20);
 floorTexture.needsUpdate = true;
 });
 const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg', (texture) => {
   ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(5, 15);
+  floorTexture.repeat.set(10, 20);
 ceilingTexture.needsUpdate = true;
 });
 const wallTexture = textureLoader.load('/textures/brick_wall_09_diff_4k.jpg', (texture) => {
  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(10,20);
+  floorTexture.repeat.set(30,10);
 wallTexture.needsUpdate = true;;
 });
 
