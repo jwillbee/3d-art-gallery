@@ -225,10 +225,10 @@ export default function GalleryApp() {
   return (
     <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
       <CameraController />
-      <ambientLight intensity={1} />
-      <pointLight position={[0, 5, 37.5]} intensity={2} />
-      <pointLight position={[5, 5, 5]} intensity={1.5} />
-      <pointLight position={[-5, 5, 5]} intensity={1.5} />
+      <ambientLight intensity={.75} />
+      <pointLight position={[0, 5, 37.5]} intensity={1} />
+      <pointLight position={[5, 5, 5]} intensity={1} />
+      <pointLight position={[-5, 5, 5]} intensity={1} />
 
      {/* Main Hall */}
 <group position={[0, 0, 0]}>
