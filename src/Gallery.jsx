@@ -12,12 +12,12 @@ const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg
   floorTexture.repeat.set(3, 21);
 floorTexture.needsUpdate = true;
 });
-const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg', (texture) => {
+const ceilingTexture = textureLoader.load('/textures/beige_wall_001_diff_4k.jpg', (texture) => {
   ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
   floorTexture.repeat.set(5, 5);
 ceilingTexture.needsUpdate = true;
 });
-const wallTexture = textureLoader.load('/textures/beige_wall_001_diff_4k.jpg', (texture) => {
+const wallTexture = textureLoader.load('/textures/leather_white_diff_4k.jpg', (texture) => {
  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
   floorTexture.repeat.set(2, 2);
 wallTexture.needsUpdate = true;;
