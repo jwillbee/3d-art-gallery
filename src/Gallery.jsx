@@ -6,12 +6,23 @@ import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 
+// Load textures
+const textureLoader = new TextureLoader();
+const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg');
+const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg');
+const wallTexture = textureLoader.load('/textures/plaster_brick_01_diff_4k.jpg');
+
+// Create materials
+const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
+const ceilingMaterial = new THREE.MeshStandardMaterial({ map: ceilingTexture });
+const wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
+
 // Wall component
 function Wall({ position, rotation, size }) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={size} />
-      <meshStandardMaterial color="white" />
+      <meshStandardMaterial map={wallTexture} />
     </mesh>
   );
 }
@@ -31,7 +42,7 @@ function Ceiling({ position, size }) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <meshStandardMaterial color="white" />
+      <meshStandardMaterial map={ceilingTexture} />
     </mesh>
   );
 }
@@ -41,7 +52,7 @@ function Floor({ position, size }) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <meshStandardMaterial color="lightgray" />
+      <meshStandardMaterial map={floorTexture} />
     </mesh>
   );
 }
