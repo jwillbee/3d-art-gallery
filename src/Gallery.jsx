@@ -14,12 +14,12 @@ floorTexture.needsUpdate = true;
 });
 const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg', (texture) => {
   ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(5, 20);
+  floorTexture.repeat.set(5, 10);
 ceilingTexture.needsUpdate = true;
 });
 const wallTexture = textureLoader.load('/textures/brick_wall_09_diff_4k.jpg', (texture) => {
  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(2, 25);
+  floorTexture.repeat.set(2, 3);
 wallTexture.needsUpdate = true;;
 });
 
