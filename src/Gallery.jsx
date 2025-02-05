@@ -17,7 +17,7 @@ const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.j
   floorTexture.repeat.set(5, 5);
 ceilingTexture.needsUpdate = true;
 });
-const wallTexture = textureLoader.load('/textures/plastered_wall_diff_4k.jpg', (texture) => {
+const wallTexture = textureLoader.load('/textures/beige_wall_001_diff_4k.jpg', (texture) => {
  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
   floorTexture.repeat.set(2, 2);
 wallTexture.needsUpdate = true;;
