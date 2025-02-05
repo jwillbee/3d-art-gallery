@@ -19,7 +19,7 @@ ceilingTexture.needsUpdate = true;
 });
 const wallTexture = textureLoader.load('/textures/plastered_wall_diff_4k.jpg', (texture) => {
  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(24, 48);
+  floorTexture.repeat.set(2, 4);
 wallTexture.needsUpdate = true;;
 });
 
