@@ -8,13 +8,16 @@ import { TextureLoader } from 'three';
 // Texture load
 const textureLoader = new TextureLoader();
 const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg', (texture) => {
-  texture.needsUpdate = true;
+  floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+floorTexture.needsUpdate = true;
 });
 const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg', (texture) => {
-  texture.needsUpdate = true;
+  ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
+ceilingTexture.needsUpdate = true;
 });
 const wallTexture = textureLoader.load('/textures/plaster_brick_01_diff_4k.jpg', (texture) => {
-  texture.needsUpdate = true;
+ wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+wallTexture.needsUpdate = true;;
 });
 
 // materials
@@ -22,16 +25,19 @@ const floorMaterial = new THREE.MeshStandardMaterial({
   map: floorTexture,
   roughness: 0.5,
   metalness: 0.1,
+  side: THREE.DoubleSide,
 });
 const ceilingMaterial = new THREE.MeshStandardMaterial({
   map: ceilingTexture,
   roughness: 0.5,
   metalness: 0.1,
+  side: THREE.DoubleSide,
 });
 const wallMaterial = new THREE.MeshStandardMaterial({
   map: wallTexture,
   roughness: 0.5,
   metalness: 0.1,
+  side: THREE.DoubleSide,
 });
 
 
