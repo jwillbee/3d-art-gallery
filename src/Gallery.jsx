@@ -34,7 +34,7 @@ function Wall({ position, rotation, size }) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={size} />
-      <meshStandardMaterial {...wallMaterial} />
+      <meshStandardMaterial map={wallMaterial.map} />
     </mesh>
   );
 }
@@ -54,7 +54,7 @@ function Ceiling({ position, size }) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <meshStandardMaterial {...ceilingMaterial} />
+      <meshStandardMaterial map={ceilingMaterial.map} />
     </mesh>
   );
 }
@@ -64,7 +64,7 @@ function Floor({ position, size }) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <meshStandardMaterial {...floorMaterial} />
+      <meshStandardMaterial map={floorMaterial.map} />
     </mesh>
   );
 }
