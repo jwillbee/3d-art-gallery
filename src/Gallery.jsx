@@ -5,11 +5,17 @@ import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 import { TextureLoader } from 'three';
 
-// texture load
+// Texture load
 const textureLoader = new TextureLoader();
-const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg');
-const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg');
-const wallTexture = textureLoader.load('/textures/plaster_brick_01_diff_4k.jpg');
+const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg', (texture) => {
+  texture.needsUpdate = true;
+});
+const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg', (texture) => {
+  texture.needsUpdate = true;
+});
+const wallTexture = textureLoader.load('/textures/plaster_brick_01_diff_4k.jpg', (texture) => {
+  texture.needsUpdate = true;
+});
 
 // materials
 const floorMaterial = new THREE.MeshStandardMaterial({
