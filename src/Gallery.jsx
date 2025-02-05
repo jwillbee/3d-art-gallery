@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
+import { TextureLoader } from 'three';
 
 // Load textures
 const textureLoader = new TextureLoader();
