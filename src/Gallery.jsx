@@ -1,5 +1,3 @@
-
-// Ensure all necessary imports are included
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
@@ -7,16 +5,29 @@ import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 import { TextureLoader } from 'three';
 
-// Load textures
+// texture load
 const textureLoader = new TextureLoader();
 const floorTexture = textureLoader.load('/textures/laminate_floor_02_diff_4k.jpg');
 const ceilingTexture = textureLoader.load('/textures/concrete_wall_008_diff_4k.jpg');
 const wallTexture = textureLoader.load('/textures/plaster_brick_01_diff_4k.jpg');
 
-// Create materials
-const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
-const ceilingMaterial = new THREE.MeshStandardMaterial({ map: ceilingTexture });
-const wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
+// materials
+const floorMaterial = new THREE.MeshStandardMaterial({
+  map: floorTexture,
+  roughness: 0.5,
+  metalness: 0.1,
+});
+const ceilingMaterial = new THREE.MeshStandardMaterial({
+  map: ceilingTexture,
+  roughness: 0.5,
+  metalness: 0.1,
+});
+const wallMaterial = new THREE.MeshStandardMaterial({
+  map: wallTexture,
+  roughness: 0.5,
+  metalness: 0.1,
+});
+
 
 // Wall component
 function Wall({ position, rotation, size }) {
@@ -199,8 +210,10 @@ export default function GalleryApp() {
   return (
     <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
       <CameraController />
-      <ambientLight intensity={0.5} />
-      <pointLight position={[0, 5, 37.5]} intensity={1} />
+      <ambientLight intensity={1} />
+      <pointLight position={[0, 5, 37.5]} intensity={2} />
+      <pointLight position={[5, 5, 5]} intensity={1.5} />
+      <pointLight position={[-5, 5, 5]} intensity={1.5} />
 
      {/* Main Hall */}
 <group position={[0, 0, 0]}>
