@@ -1,7 +1,5 @@
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useLoader } from '@react-three/fiber';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
@@ -84,12 +82,6 @@ function Floor({ position, size }) {
       <meshStandardMaterial map={floorMaterial.map} />
     </mesh>
   );
-}
-
-function Chair1({ url, position }) {
-  const gltf = useLoader(GLTFLoader, url);
-
-  return <primitive object={gltf.scene} position={position} />;
 }
 
 // Camera Controller with Collision Detection (unchanged)
@@ -287,9 +279,7 @@ export default function GalleryApp() {
     rotation={[0, -Math.PI / 2, 0]}
   />
 ))}
- <Suspense fallback={null}>
-  <Chair1 url="/textures/sofa_free_version.glb" position={[4.5, 0, 68]} rotation={[0, Math.PI / 2, 0]} />
-</Suspense>
+
 </group>
 
 
