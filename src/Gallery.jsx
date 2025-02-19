@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useSpring } from '@react-spring/three';
 import * as THREE from 'three';
+import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 
 // Texture load
@@ -18,9 +19,9 @@ const ceilingTexture = textureLoader.load('/textures/beige_wall_001_diff_4k.jpg'
 ceilingTexture.needsUpdate = true;
 });
 const wallTexture = textureLoader.load('/textures/leather_white_diff_4k.jpg', (texture) => {
- wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(2, 2);
-wallTexture.needsUpdate = true;;
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 1); // Start with a 1:1 scale and adjust in Wall component
+  texture.needsUpdate = true;
 });
 
 // materials
@@ -43,23 +44,72 @@ const wallMaterial = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 });
 
-
 // Wall component
 function Wall({ position, rotation, size }) {
+  const wallRef = useRef();
+
+  useEffect(() => {
+    if (wallRef.current) {
+      const geometry = wallRef.current.geometry;
+      const uvAttribute = geometry.attributes.uv;
+      const width = size[0]; // X-axis size
+      const height = size[1]; // Y-axis size
+
+      // Adjust UV mapping based on the wall size
+      for (let i = 0; i < uvAttribute.count; i++) {
+        const u = uvAttribute.getX(i) * (width / 2);
+        const v = uvAttribute.getY(i) * (height / 2);
+        uvAttribute.setXY(i, u, v);
+      }
+      uvAttribute.needsUpdate = true;
+    }
+  }, [size]);
+
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh ref={wallRef} position={position} rotation={rotation}>
       <boxGeometry args={size} />
       <meshStandardMaterial map={wallMaterial.map} />
     </mesh>
   );
 }
 
-// ArtFrame component
-function ArtFrame({ position, rotation }) {
+function ArtFrame({ position, rotation, size = [1.5, 1, 0.1], image }) {
+  const texture = image ? useLoader(THREE.TextureLoader, image) : null;
+
+  // Fallback blank white texture
+  const blankTexture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+    const context = canvas.getContext("2d");
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+
+  // Ensure the texture loads correctly
+  useEffect(() => {
+    if (texture) {
+      texture.needsUpdate = true;
+    }
+  }, [texture]);
+
+  // Define materials (image only on the front face)
+  const materials = [
+    new THREE.MeshStandardMaterial({ color: "#888888" }), // Right
+    new THREE.MeshStandardMaterial({ color: "#888888" }), // Left
+    new THREE.MeshStandardMaterial({ color: "#aaaaaa" }), // Top
+    new THREE.MeshStandardMaterial({ color: "#aaaaaa" }), // Bottom
+    new THREE.MeshStandardMaterial({ map: texture || blankTexture }), // Front (Art side)
+    new THREE.MeshStandardMaterial({ color: "#555555" }), // Back
+  ];
+
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[1.5, 1, 0.1]} />
-      <meshStandardMaterial color="gray" />
+      <boxGeometry args={size} />
+      {materials.map((mat, index) => (
+        <meshStandardMaterial key={index} attach={`material-${index}`} {...mat} />
+      ))}
     </mesh>
   );
 }
@@ -220,7 +270,7 @@ function CameraController() {
 
 // Main Gallery component with adjustments
 export default function GalleryApp() {
-  const cameraStartPosition = [0, 2, 70];
+  const cameraStartPosition = [0, 2, 72];
 
   return (
     <Canvas camera={{ position: cameraStartPosition, fov: 75 }}>
@@ -243,6 +293,7 @@ export default function GalleryApp() {
   <Wall position={[0, 2.5, 75]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
   {/* Left Wall */}
   <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
+  <Wall position={[-4, 2.5, 64]} rotation={[0, 0, 0]} size = {[3, 5, .3]} />
   {/* Right Wall */}
   {/* Divided into three segments to create two openings for the side rooms */}
   {/* First Segment (from z = 0 to z = 10) */}
@@ -265,21 +316,9 @@ export default function GalleryApp() {
   />
   {/* ArtFrames */}
   {/* Left Wall */}
-  {[10, 25, 40, 55, 70].map((zPos) => (
-  <ArtFrame
-    key={`left-frame-${zPos}`}
-    position={[-4.9, 2, zPos]}
-    rotation={[0, Math.PI / 2, 0]}
-  />
-))}
-  {[10, 65].map((zPos) => (
-  <ArtFrame
-    key={`right-frame-${zPos}`}
-    position={[4.9, 2, zPos]}
-    rotation={[0, -Math.PI / 2, 0]}
-  />
-))}
-
+  <ArtFrame position={[-4.8, 2.3, 65]} rotation={[0, Math.PI / 2, 0]} size={[2, 3, 0.1]} image="/art/two_birds_(ptilonopus_auranthfrons)_1973.26.15.jpg"/>
+  <ArtFrame position={[-4.8, 2.3, 61]} rotation={[0, Math.PI / 2, 0]} size={[3, 3, 0.1]} image="/art/washington_bridge_and_speedway,_new_york_2018.177.193.jpg"/>
+  <ArtFrame position={[-4.8, 2.3, 56]} rotation={[0, Math.PI / 2, 0]} size={[4, 4, 0.1]} image="/art/architectural_fantasy_with_obelisks,_ruins,_and_a_piazza_1982.24.2.jpg"/>
 </group>
 
 
@@ -308,31 +347,6 @@ export default function GalleryApp() {
         <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
         <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
       </group>
-
-     {/* New Side Room closer to the start point */}
-<group position={[10, 0, 10]}>
-  {/* Floor */}
-  <Floor position={[0, 0, 0]} size={[10, 0.1, 15]} />
-  {/* Ceiling */}
-  <Ceiling position={[0, 5, 0]} size={[10, 0.1, 15]} />
-  {/* Walls */}
-  {/* Back Wall */}
-  <Wall position={[0, 2.5, -7.5]} rotation={[0, 0, 0]} size={[10, 5, 0.1]} />
-  {/* Front Wall */}
-  <Wall position={[0, 2.5, 7.5]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
-  {/* Right Wall */}
-  <Wall position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[15, 5, 0.1]} />
-  {/* No Left Wall (open to the main hall) */}
-  {/* ArtFrames */}
-  {/* Back Wall */}
-  <ArtFrame position={[0, 2, -7.4]} rotation={[0, 0, 0]} />
-  {/* Front Wall */}
-  <ArtFrame position={[0, 2, 7.4]} rotation={[0, Math.PI, 0]} />
-  {/* Right Wall */}
-  <ArtFrame position={[4.9, 2, -5]} rotation={[0, -Math.PI / 2, 0]} />
-  <ArtFrame position={[4.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]} />
-  <ArtFrame position={[4.9, 2, 5]} rotation={[0, -Math.PI / 2, 0]} />
-</group>
 
     </Canvas>
   );
