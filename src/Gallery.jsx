@@ -15,8 +15,8 @@ floorTexture.needsUpdate = true;
 });
 const ceilingTexture = textureLoader.load('/textures/square_tiles_03_diff_4k.jpg', (texture) => {
   ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(5, 5);
-ceilingTexture.needsUpdate = true;
+  ceilingTexture.repeat.set(1.5, 10);
+  texture.needsUpdate = true;
 });
 const wallTexture = textureLoader.load('/textures/brick_wall_10_diff_4k.jpg', (texture) => {
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -25,8 +25,13 @@ const wallTexture = textureLoader.load('/textures/brick_wall_10_diff_4k.jpg', (t
 });
 const moldingTexture = textureLoader.load('/textures/painted_plaster_wall_disp_4k.png', (texture) => {
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(1, 1); // Start with a 1:1 scale and adjust in Wall component
+  texture.repeat.set(1, 1); 
   moldingTexture.needsUpdate = true;
+});
+const interiorwallTexture = textureLoader.load('/textures/brown_wood_planks.jpg', (texture) => {
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 2); 
+  interiorwallTexture.needsUpdate = true;
 });
 
 // materials
@@ -50,6 +55,12 @@ const wallMaterial = new THREE.MeshStandardMaterial({
 });
 const moldingMaterial = new THREE.MeshStandardMaterial({
   map: moldingTexture,
+  roughness: 0.5,
+  metalness: 0.1,
+  side: THREE.DoubleSide,
+});
+const interiorwallMaterial = new THREE.MeshStandardMaterial({
+  map: interiorwallTexture,
   roughness: 0.5,
   metalness: 0.1,
   side: THREE.DoubleSide,
@@ -151,6 +162,16 @@ function Molding({ position, size }) {
     <mesh position={position}>
       <boxGeometry args={size} />
       <meshStandardMaterial map={moldingMaterial.map} />
+    </mesh>
+  );
+}
+
+// InteriorWall component
+function InteriorWall({ position, size }) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={size} />
+      <meshStandardMaterial map={interiorwallMaterial.map} />
     </mesh>
   );
 }
@@ -316,7 +337,12 @@ export default function GalleryApp() {
   <Wall position={[0, 2.5, 75]} rotation={[0, Math.PI, 0]} size={[10, 5, 0.1]} />
   {/* Far Back Wall */}
   <Wall position={[-5, 2.5, 37.5]} rotation={[0, Math.PI / 2, 0]} size={[75, 5, 0.1]} />
-  <Wall position={[-4, 2.5, 64]} rotation={[0, 0, 0]} size = {[3, 5, .3]} />
+  {/* Interior Walls */}
+  {/* First Interior Wall */}
+  <InteriorWall position={[-2.5, 2.5, 64]} rotation={[0, 0, 0]} size = {[5, 5, .3]} />
+  <Molding position={[-2.5, 4.9, 64.15]} rotation={[0, 0, 0]} size={[5, 0.2, 0.1]} />
+  <Molding position={[-2.5, .2, 64.15]} rotation={[0, 0, 0]} size={[5, 0.3, 0.1]} />
+  <ArtFrame position={[-2.5, 2.3, 64.15]} rotation={[0, 0, 0]} size={[2, 3, 0.1]} image="/art/mountain_mocking-bird_and_varied_thrush_1945.8.369.jpg"/>
   {/* Right Wall */}
   <Molding position={[4.95, 4.9, 60]} rotation={[0, Math.PI, 0]} size={[0.1, 0.2, 30]} />
   <Molding position={[4.95, .2, 60]} rotation={[0, Math.PI, 0]} size={[0.1, 0.3, 30]} />
@@ -349,9 +375,9 @@ export default function GalleryApp() {
   />
   {/* ArtFrames */}
   {/* Left Wall */}
-  <ArtFrame position={[-4.8, 2.3, 65]} rotation={[0, Math.PI / 2, 0]} size={[2, 3, 0.1]} image="/art/two_birds_(ptilonopus_auranthfrons)_1973.26.15.jpg"/>
-  <ArtFrame position={[-4.8, 2.3, 61]} rotation={[0, Math.PI / 2, 0]} size={[3, 3, 0.1]} image="/art/washington_bridge_and_speedway,_new_york_2018.177.193.jpg"/>
-  <ArtFrame position={[-4.8, 2.3, 56]} rotation={[0, Math.PI / 2, 0]} size={[4, 4, 0.1]} image="/art/architectural_fantasy_with_obelisks,_ruins,_and_a_piazza_1982.24.2.jpg"/>
+  <ArtFrame position={[-4.95, 2.3, 66]} rotation={[0, Math.PI / 2, 0]} size={[2, 3, 0.1]} image="/art/two_birds_(ptilonopus_auranthfrons)_1973.26.15.jpg"/>
+  <ArtFrame position={[-4.95, 2.3, 61]} rotation={[0, Math.PI / 2, 0]} size={[3, 3, 0.1]} image="/art/washington_bridge_and_speedway,_new_york_2018.177.193.jpg"/>
+  <ArtFrame position={[-4.95, 2.3, 56]} rotation={[0, Math.PI / 2, 0]} size={[4, 4, 0.1]} image="/art/architectural_fantasy_with_obelisks,_ruins,_and_a_piazza_1982.24.2.jpg"/>
 </group>
 
 
