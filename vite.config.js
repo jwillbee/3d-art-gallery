@@ -3,9 +3,10 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/",
+  base: "", // Change this to "" (empty) or remove it entirely
   build: {
-    outDir: "dist",
-  },
+    outDir: "dist"
+  }
 });
+
 
