@@ -176,11 +176,11 @@ function InteriorWall({ position, size }) {
   );
 }
 
-// Camera Controller with Collision Detection (unchanged)
+// Camera Controller with Collision Detection
 function CameraController() {
   const { camera } = useThree();
   const touchData = useRef({ startX: 0, startY: 0, isTwoFinger: false });
-  const speed = 0.5;
+  const speed = 1; //fwd, back, side to side movement speed
   const threshold = 20;
 
   const boundaries = [
@@ -227,7 +227,7 @@ function CameraController() {
           (currentX + e.touches[1].clientX) / 2 -
           (touchData.current.startX + touchData.current.startX2) / 2;
 
-        const newRotationY = rotationY.get() - deltaX * 0.005;
+        const newRotationY = rotationY.get() - deltaX * 0.01; //cam rotation speed
 
         api.start({ rotationY: newRotationY });
 
